@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  username String
+  avatar String
+  discord_id String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  todoGroup TodoGroup[]
+}
+
+model TodoGroup {
+  id Int @id @default(autoincrement())
+  all_done Boolean @default(false)
+
+  user User @relation(fields: [author], references: [id])
+  author Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  todos Todo[]
+}
+
+model Todo {
+  id Int @id @default(autoincrement())
+  done Boolean @default(false)
+  title String @db.VarChar(100)
+  content String @db.VarChar(500)
+
+  group TodoGroup @relation(fields: [groupId], references: [id])
+  groupId Int
+}
