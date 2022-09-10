@@ -2,17 +2,13 @@ import type { Cookies, Handle } from '@sveltejs/kit'
 
 import { BASE_URL } from '$env/static/private'
 import { verify } from './utils/sign'
+import { redirectResponse } from './utils/response'
 
-const errorRedirect = new Response(null, {
-  headers: {
-    location: BASE_URL,
-  },
-  status: 301,
-})
+const errorRedirect = redirectResponse(`${BASE_URL}?message=Unauthorized`)
 
 const authorize = async (
   cookies: Cookies,
-  onSuccess: () => Promise<Response> | Response,
+  onSuccess: (userId: string) => Promise<Response> | Response,
 ) => {
   const idCookie = cookies.get('id')
 
@@ -27,7 +23,11 @@ const authorize = async (
     return errorRedirect
   }
 
-  return onSuccess()
+  return onSuccess(id)
+}
+
+export type RequestLocals = {
+  id: string
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -35,7 +35,12 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api')
     || event.url.pathname.startsWith('/dashboard')
   ) {
-    return authorize(event.cookies, () => resolve(event))
+    return authorize(event.cookies, (userId) => {
+      event.locals = {
+        id: userId,
+      }
+      return resolve(event)
+    })
   }
 
   return resolve(event)

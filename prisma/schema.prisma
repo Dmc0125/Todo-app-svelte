@@ -23,6 +23,8 @@ model User {
 model TodoGroup {
   id Int @id @default(autoincrement())
   all_done Boolean @default(false)
+  name String @db.VarChar(100)
+  description String @db.VarChar(300)
 
   user User @relation(fields: [author], references: [id])
   author Int

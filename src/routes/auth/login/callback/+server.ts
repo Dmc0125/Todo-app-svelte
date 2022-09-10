@@ -1,15 +1,11 @@
+import type { RequestHandler } from './$types'
 import { BASE_URL } from '$env/static/private'
 import { getAccessToken, getUserProfile } from '$lib/utils/discord'
 import { prismaClient } from '$lib/utils/prisma'
+import { redirectResponse } from '$lib/utils/response'
 import { sign } from '$lib/utils/sign'
-import type { RequestHandler } from './$types'
 
-const errorRedirect = new Response(null, {
-  headers: {
-    location: BASE_URL,
-  },
-  status: 301,
-})
+const errorRedirect = redirectResponse(BASE_URL)
 
 export const GET: RequestHandler = async ({ url }) => {
   const codeParam = url.searchParams.get('code')
