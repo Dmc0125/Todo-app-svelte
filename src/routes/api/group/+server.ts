@@ -34,7 +34,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   })
 
   return jsonResponse({
-    success: true,
     data: insertedGroup,
   })
+}
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const { id } = locals as RequestLocals
+  const groupId = url.searchParams.get('id')
+  
+  try {
+    if (!groupId) {
+      // Find all
+      const groups = await prismaClient.todoGroup.findMany({
+        where: {
+          author: Number(id),
+        },
+      })
+      return jsonResponse(groups)
+    }
+
+    // Find one
+    const group = await prismaClient.todoGroup.findFirst({
+      where: { id: Number(groupId), author: Number(id) },
+    })
+    return jsonResponse(group)
+  } catch (error) {
+    return jsonResponse('Server error', {
+      init: {
+        status: 500,
+      },
+      success: false,
+    })
+  }
+
 }

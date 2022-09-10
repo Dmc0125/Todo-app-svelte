@@ -17,6 +17,10 @@ const authorize = async (
   }
 
   const [id, sig] = idCookie.split('.')
+  if (!id || !sig) {
+    return errorRedirect
+  }
+
   const isSigned = await verify(sig, id)
 
   if (!isSigned) {

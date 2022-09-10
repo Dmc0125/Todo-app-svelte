@@ -1,21 +1,39 @@
 import type { z } from 'zod'
 
-export const jsonResponse = (body: unknown, init?: ResponseInit) => (
-  new Response(JSON.stringify(body), {
+type JsonResponseConfig = {
+  success?: boolean
+  init?: ResponseInit
+}
+
+export const jsonResponse = (data: unknown, config?: JsonResponseConfig) => {
+  const { success, init } = config || {
+    success: true,
+    init: {},
+  }
+
+  const body = success ? { data } : { error: data }
+
+  return new Response(JSON.stringify({
+    success,
+    ...body,    
+  }), {
     ...init,
     headers: {
       ...(init?.headers || {}),
       'content-type': 'application/json',
     },
   })
-)
+}
 
+// TODO: Create error response handler
 export const zodErrorResponse = <T>(err: z.ZodError<T>) => (
   jsonResponse({
     error: err.errors.map(({ message }) => message),
     success: false,
   }, {
-    status: 400,
+    init: {
+      status: 400,
+    },
   })
 )
 
