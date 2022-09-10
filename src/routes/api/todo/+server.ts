@@ -4,6 +4,7 @@ import type { RequestHandler } from './$types'
 import { requiredError, typeError } from '$lib/utils/zod'
 import { jsonResponse, zodErrorResponse } from '$lib/utils/response'
 import { prismaClient } from '$lib/utils/prisma'
+import { idStrToNumSchema } from './utils'
 
 const todoSchema = z.object({
   title: z
@@ -52,6 +53,14 @@ export const POST: RequestHandler = async ({ request }) => {
     const insertedTodo = await prismaClient.todo.create({
       data: result.data,
     })
+    await prismaClient.todoGroup.update({
+      where: {
+        id: groupId,
+      },
+      data: {
+        todosCount: { increment: 1 },
+      },
+    })
     return jsonResponse(insertedTodo)
   } catch (error) {
     return jsonResponse('Server error.', {
@@ -62,51 +71,24 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 }
 
-const getTodosQuerySchema = z.object({
-  todoId: z
-    .string({
-      invalid_type_error: typeError('todoId', 'number'),
-    })
-    .regex(/^[1-9][0-9]*/)
-    .nullable(),
-  groupId: z
-    .string({
-      required_error: requiredError('groupId'),
-      invalid_type_error: typeError('groupId', 'number'),
-    })
-    .regex(/^[1-9][0-9]*/),
-})
-
 export const GET: RequestHandler = async ({ url }) => {
-  const result = getTodosQuerySchema.safeParse({
-    todoId: url.searchParams.get('todoId'),
-    groupId: url.searchParams.get('groupId'),
-  })
+  const result = idStrToNumSchema({
+    required_error: requiredError('groupId'),
+    invalid_type_error: typeError('groupId', 'number'),
+  }).safeParse(url.searchParams.get('groupId'))
+
   if (!result.success) {
     return zodErrorResponse(result.error)
   }
 
-  const { todoId, groupId } = result.data
-  const todoIdNum = Number(todoId)
-  const groupIdNum = Number(groupId)
-
   try {
-    const data = await (async () => {
-      if (todoId) {
-        return prismaClient.todo.findFirst({
-          where: {
-            id: todoIdNum,
-            groupId: groupIdNum,
-          },
-        })
-      }
-      return prismaClient.todo.findMany({
+    return jsonResponse(
+      await prismaClient.todo.findMany({
         where: {
-          groupId: groupIdNum,
+          groupId: result.data,
         },
-      })
-    })()
-    return jsonResponse(data)
+      }),
+    )
   } catch (error) {
     return jsonResponse('Server error.', {
       init: {
