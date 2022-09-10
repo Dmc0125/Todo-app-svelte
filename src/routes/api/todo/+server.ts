@@ -20,6 +20,7 @@ const todoSchema = z.object({
   }).min(1),
 })
 
+// TODO: Add total todos to group and increment on create
 export const POST: RequestHandler = async ({ request }) => {
   const result = todoSchema.safeParse(await request.json())
   if (!result.success) {
@@ -51,4 +52,54 @@ export const POST: RequestHandler = async ({ request }) => {
       },
     })
   }
+}
+
+const getTodosQuerySchema = z.object({
+  todoId: z.string({
+    invalid_type_error: typeError('todoId', 'number'),
+  }).regex(/^[1-9][0-9]*/).nullable(),
+  groupId: z.string({
+    required_error: requiredError('groupId'),
+    invalid_type_error: typeError('groupId', 'number'),
+  }).regex(/^[1-9][0-9]*/),
+})
+
+export const GET: RequestHandler = async ({ url }) => {
+  const result = getTodosQuerySchema.safeParse({
+    todoId: url.searchParams.get('todoId'),
+    groupId: url.searchParams.get('groupId'),
+  })
+  if (!result.success) {
+    return zodErrorResponse(result.error)
+  }
+
+  const { todoId, groupId } = result.data
+  const todoIdNum = Number(todoId)
+  const groupIdNum = Number(groupId)
+
+  try {
+    const data = await (async () => {
+      if (todoId) {
+        return prismaClient.todo.findFirst({
+          where: {
+            id: todoIdNum,
+            groupId: groupIdNum,
+          },
+        })
+      }
+      return prismaClient.todo.findMany({
+        where: {
+          groupId: groupIdNum,
+        },
+      })
+    })()
+    return jsonResponse(data)
+  } catch (error) {
+    return jsonResponse('Server error.', {
+      init: {
+        status: 500,
+      },
+    })
+  }
+  
 }
