@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
   if (!codeParam) {
     return errorRedirect
   }
-  
+
   const accessTokenData = await getAccessToken(codeParam)
   if ('error' in accessTokenData) {
     return errorRedirect
@@ -20,7 +20,9 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const profileData = await getUserProfile(accessTokenData.access_token)
   const user = await (async () => {
-    const existingUser = await prismaClient.user.findFirst({ where: { discord_id: profileData.id }})  
+    const existingUser = await prismaClient.user.findFirst({
+      where: { discord_id: profileData.id },
+    })
 
     if (!existingUser) {
       const insertedUser = await prismaClient.user.create({
@@ -36,13 +38,13 @@ export const GET: RequestHandler = async ({ url }) => {
     // TODO: if user exist, check if avatar needs to be updated
     return existingUser
   })()
-  
+
   const signature = await sign(user.id.toString())
   return new Response(null, {
     headers: {
       'set-cookie': `id=${user.id.toString()}.${signature}; HttpOnly=true; Max-Age=${
-				60 * 60 * 24
-			}; Path=/`,
+        60 * 60 * 24
+      }; Path=/`,
       location: '/dashboard',
     },
     status: 301,

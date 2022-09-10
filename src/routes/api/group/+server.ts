@@ -7,13 +7,19 @@ import { jsonResponse, zodErrorResponse } from '$lib/utils/response'
 import { requiredError, typeError } from '$lib/utils/zod'
 
 const groupSchema = z.object({
-  name: z.string({
-    required_error: requiredError('name'),
-    invalid_type_error: typeError('name', 'string'),
-  }).min(1).max(100),
-  description: z.string({
-    invalid_type_error: typeError('description', 'string'),
-  }).max(300).default(''),
+  name: z
+    .string({
+      required_error: requiredError('name'),
+      invalid_type_error: typeError('name', 'string'),
+    })
+    .min(1)
+    .max(100),
+  description: z
+    .string({
+      invalid_type_error: typeError('description', 'string'),
+    })
+    .max(300)
+    .default(''),
 })
 
 // Create Todo group
@@ -43,7 +49,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async ({ url, locals }) => {
   const { id } = locals as RequestLocals
   const groupId = url.searchParams.get('id')
-  
+
   try {
     if (!groupId) {
       // Find all
@@ -68,5 +74,4 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       success: false,
     })
   }
-
 }

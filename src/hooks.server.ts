@@ -35,10 +35,7 @@ export type RequestLocals = {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  if (
-    event.url.pathname.startsWith('/api')
-    || event.url.pathname.startsWith('/dashboard')
-  ) {
+  if (event.url.pathname.startsWith('/api') || event.url.pathname.startsWith('/dashboard')) {
     return authorize(event.cookies, (userId) => {
       event.locals = {
         id: userId,

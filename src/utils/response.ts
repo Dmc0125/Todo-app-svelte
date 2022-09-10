@@ -13,33 +13,37 @@ export const jsonResponse = (data: unknown, config?: JsonResponseConfig) => {
 
   const body = success ? { data } : { error: data }
 
-  return new Response(JSON.stringify({
-    success,
-    ...body,    
-  }), {
-    ...init,
-    headers: {
-      ...(init?.headers || {}),
-      'content-type': 'application/json',
+  return new Response(
+    JSON.stringify({
+      success,
+      ...body,
+    }),
+    {
+      ...init,
+      headers: {
+        ...(init?.headers || {}),
+        'content-type': 'application/json',
+      },
     },
-  })
+  )
 }
 
 // TODO: Create error response handler
-export const zodErrorResponse = <T>(err: z.ZodError<T>) => (
-  jsonResponse(err.errors.map(({ message }) => message), {
-    init: {
-      status: 400,
+export const zodErrorResponse = <T>(err: z.ZodError<T>) =>
+  jsonResponse(
+    err.errors.map(({ message }) => message),
+    {
+      init: {
+        status: 400,
+      },
+      success: false,
     },
-    success: false,
-  })
-)
+  )
 
-export const redirectResponse = (location: string, status = 301) => (
+export const redirectResponse = (location: string, status = 301) =>
   new Response(null, {
     headers: {
       location,
     },
     status,
   })
-)
