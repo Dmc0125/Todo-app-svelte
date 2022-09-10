@@ -16,6 +16,7 @@ const groupSchema = z.object({
   }).max(300).default(''),
 })
 
+// Create Todo group
 export const POST: RequestHandler = async ({ request, locals }) => {
   const { id } = locals as RequestLocals
 
@@ -38,6 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   })
 }
 
+// Find one or all Todo groups for user
 export const GET: RequestHandler = async ({ url, locals }) => {
   const { id } = locals as RequestLocals
   const groupId = url.searchParams.get('id')

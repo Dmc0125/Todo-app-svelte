@@ -27,13 +27,11 @@ export const jsonResponse = (data: unknown, config?: JsonResponseConfig) => {
 
 // TODO: Create error response handler
 export const zodErrorResponse = <T>(err: z.ZodError<T>) => (
-  jsonResponse({
-    error: err.errors.map(({ message }) => message),
-    success: false,
-  }, {
+  jsonResponse(err.errors.map(({ message }) => message), {
     init: {
       status: 400,
     },
+    success: false,
   })
 )
 
