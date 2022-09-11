@@ -3,7 +3,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 import type { RequestHandler } from './$types'
 import { requiredError, typeError } from '$lib/utils/zod'
-import { jsonResponse, zodErrorResponse } from '$lib/utils/response'
+import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
 import { idStrToNumSchema } from '../utils'
 import { prismaClient } from '$lib/utils/prisma'
 
@@ -23,8 +23,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     groupId: url.searchParams.get('groupId'),
   })
   if (!result.success) {
-    console.log(result.error)
-    return zodErrorResponse(result.error)
+    return errorResponse(AppError.validation, result.error)
   }
 
   const { todoId, groupId } = result.data
@@ -37,17 +36,21 @@ export const GET: RequestHandler = async ({ params, url }) => {
     })
     return jsonResponse(todo)
   } catch (error) {
-    return jsonResponse('Server error')
+    return errorResponse(AppError.unknown)
   }
 }
 
-const setDoneSchema = z.object({
-  done: z.boolean(),
-  groupId: z.number({
-    required_error: requiredError('groupId'),
-    invalid_type_error: typeError('groupId', 'number'),
-  }).min(1),
-}).merge(getSchema.pick({ todoId: true }))
+const setDoneSchema = z
+  .object({
+    done: z.boolean(),
+    groupId: z
+      .number({
+        required_error: requiredError('groupId'),
+        invalid_type_error: typeError('groupId', 'number'),
+      })
+      .min(1),
+  })
+  .merge(getSchema.pick({ todoId: true }))
 
 export const PUT: RequestHandler = async ({ request, params }) => {
   const body = await request.json()
@@ -56,7 +59,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     todoId: params.id,
   })
   if (!result.success) {
-    return zodErrorResponse(result.error)
+    return errorResponse(AppError.validation, result.error)
   }
 
   const { groupId, todoId, done } = result.data
@@ -83,16 +86,11 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     return jsonResponse(todo)
   } catch (error) {
     if (
-      error instanceof PrismaClientKnownRequestError
-      && error.meta?.cause === 'Record to update not found.'
+      error instanceof PrismaClientKnownRequestError &&
+      error.meta?.cause === 'Record to update not found.'
     ) {
-      return jsonResponse('Todo or todoGroup not found.', {
-        init: {
-          status: 404,
-        },
-        success: false,
-      })
+      return errorResponse(AppError.notFound, 'Todo or todoGroup not found.')
     }
-    return jsonResponse('Server error.')
+    return errorResponse(AppError.unknown)
   }
 }

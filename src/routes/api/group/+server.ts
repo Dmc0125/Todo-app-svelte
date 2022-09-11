@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { RequestHandler } from './$types'
 import type { RequestLocals } from '$lib/hooks.server'
 import { prismaClient } from '$lib/utils/prisma'
-import { jsonResponse, zodErrorResponse } from '$lib/utils/response'
+import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
 import { requiredError, typeError } from '$lib/utils/zod'
 
 const groupSchema = z.object({
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const result = groupSchema.safeParse(await request.json())
   if (!result.success) {
-    return zodErrorResponse(result.error)
+    return errorResponse(AppError.validation, result.error)
   }
 
   const { name, description } = result.data
@@ -67,11 +67,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     })
     return jsonResponse(group)
   } catch (error) {
-    return jsonResponse('Server error', {
-      init: {
-        status: 500,
-      },
-      success: false,
-    })
+    return errorResponse(AppError.unknown)
   }
 }

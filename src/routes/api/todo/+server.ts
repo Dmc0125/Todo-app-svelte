@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import type { RequestHandler } from './$types'
 import { requiredError, typeError } from '$lib/utils/zod'
-import { jsonResponse, zodErrorResponse } from '$lib/utils/response'
+import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
 import { prismaClient } from '$lib/utils/prisma'
 import { idStrToNumSchema } from './utils'
 
@@ -33,7 +33,7 @@ const todoSchema = z.object({
 export const POST: RequestHandler = async ({ request }) => {
   const result = todoSchema.safeParse(await request.json())
   if (!result.success) {
-    return zodErrorResponse(result.error)
+    return errorResponse(AppError.validation, result.error)
   }
 
   const { groupId } = result.data
@@ -44,9 +44,7 @@ export const POST: RequestHandler = async ({ request }) => {
   })
 
   if (!group) {
-    return jsonResponse(`Group with id ${groupId} does not exist.`, {
-      success: false,
-    })
+    return errorResponse(AppError.notFound, `Group with id ${groupId} does not exist.`)
   }
 
   try {
@@ -63,11 +61,7 @@ export const POST: RequestHandler = async ({ request }) => {
     })
     return jsonResponse(insertedTodo)
   } catch (error) {
-    return jsonResponse('Server error.', {
-      init: {
-        status: 500,
-      },
-    })
+    return errorResponse(AppError.unknown)
   }
 }
 
@@ -78,7 +72,7 @@ export const GET: RequestHandler = async ({ url }) => {
   }).safeParse(url.searchParams.get('groupId'))
 
   if (!result.success) {
-    return zodErrorResponse(result.error)
+    return errorResponse(AppError.validation, result.error)
   }
 
   try {
@@ -90,10 +84,6 @@ export const GET: RequestHandler = async ({ url }) => {
       }),
     )
   } catch (error) {
-    return jsonResponse('Server error.', {
-      init: {
-        status: 500,
-      },
-    })
+    return errorResponse(AppError.unknown)
   }
 }

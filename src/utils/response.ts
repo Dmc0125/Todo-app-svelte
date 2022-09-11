@@ -1,4 +1,4 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
 type JsonResponseConfig = {
   success?: boolean
@@ -28,18 +28,6 @@ export const jsonResponse = (data: unknown, config?: JsonResponseConfig) => {
   )
 }
 
-// TODO: Create error response handler
-export const zodErrorResponse = <T>(err: z.ZodError<T>) =>
-  jsonResponse(
-    err.errors.map(({ message }) => message),
-    {
-      init: {
-        status: 400,
-      },
-      success: false,
-    },
-  )
-
 export const redirectResponse = (location: string, status = 301) =>
   new Response(null, {
     headers: {
@@ -47,3 +35,40 @@ export const redirectResponse = (location: string, status = 301) =>
     },
     status,
   })
+
+export enum AppError {
+  unknown = 'ServerError',
+  validation = 'ValidationError',
+  notFound = 'NotFoundError',
+}
+
+export const errorResponse = (error: AppError, message?: string | string[] | z.ZodError) => {
+  switch (error) {
+    case AppError.unknown: {
+      return jsonResponse(error, {
+        init: {
+          status: 500,
+        },
+        success: false,
+      })
+    }
+    case AppError.validation: {
+      const errMessage =
+        message instanceof z.ZodError ? message.errors.map(({ message }) => message) : message
+      return jsonResponse(errMessage, {
+        init: {
+          status: 400,
+        },
+        success: false,
+      })
+    }
+    case AppError.notFound: {
+      return jsonResponse(message || error, {
+        init: {
+          status: 404,
+        },
+        success: false,
+      })
+    }
+  }
+}
