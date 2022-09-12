@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types'
-import { BASE_URL } from '$env/static/private'
+import { PUBLIC_BASE_URL } from '$env/static/public'
 import { getAccessToken, getUserProfile } from '$lib/utils/discord'
 import { prismaClient } from '$lib/utils/prisma'
 import { redirectResponse } from '$lib/utils/response'
 import { sign } from '$lib/utils/sign'
 
-const errorRedirect = redirectResponse(BASE_URL)
+const errorRedirect = redirectResponse(PUBLIC_BASE_URL)
 
 export const GET: RequestHandler = async ({ url }) => {
   const codeParam = url.searchParams.get('code')

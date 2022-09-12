@@ -1,10 +1,10 @@
 import type { Cookies, Handle } from '@sveltejs/kit'
 
-import { BASE_URL } from '$env/static/private'
+import { PUBLIC_BASE_URL } from '$env/static/public'
 import { verify } from './utils/sign'
 import { redirectResponse } from './utils/response'
 
-const errorRedirect = redirectResponse(`${BASE_URL}?message=Unauthorized`)
+const errorRedirect = redirectResponse(`${PUBLIC_BASE_URL}?message=Unauthorized`)
 
 const authorize = async (
   cookies: Cookies,

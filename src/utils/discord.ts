@@ -1,10 +1,11 @@
-import { BASE_URL, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET } from '$env/static/private'
+import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET } from '$env/static/private'
+import { PUBLIC_BASE_URL } from '$env/static/public'
 
 const DISCORD_BASE_URL = 'https://discord.com/api'
 
 const authUrlParams = new URLSearchParams({
   client_id: DISCORD_CLIENT_ID,
-  redirect_uri: new URL(`${BASE_URL}/auth/login/callback`).toString(),
+  redirect_uri: new URL(`${PUBLIC_BASE_URL}/auth/login/callback`).toString(),
   response_type: 'code',
   scope: 'identify',
 })
@@ -30,7 +31,7 @@ export const getAccessToken = async (code: string) =>
         client_id: DISCORD_CLIENT_ID,
         client_secret: DISCORD_CLIENT_SECRET,
         grant_type: 'authorization_code',
-        redirect_uri: `${BASE_URL}/auth/login/callback`,
+        redirect_uri: `${PUBLIC_BASE_URL}/auth/login/callback`,
         code,
       }),
       headers: {

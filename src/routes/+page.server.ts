@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit'
 
 import type { PageServerLoad } from './$types'
 import { verify } from '$lib/utils/sign'
-import { BASE_URL } from '$env/static/private'
+import { PUBLIC_BASE_URL } from '$env/static/public'
 
 export const load: PageServerLoad = async ({ request }) => {
   const cookies = request.headers.get('Cookie')
@@ -20,6 +20,6 @@ export const load: PageServerLoad = async ({ request }) => {
   const isSigned = await verify(sig, id)
 
   if (isSigned) {
-    throw redirect(301, `${BASE_URL}/dashboard`)
+    throw redirect(301, `${PUBLIC_BASE_URL}/dashboard`)
   }
 }
