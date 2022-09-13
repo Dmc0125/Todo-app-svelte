@@ -33,7 +33,7 @@
     align-items: center;
   }
 
-  h1 {
+  h2 {
     margin-bottom: 0;
   }
 

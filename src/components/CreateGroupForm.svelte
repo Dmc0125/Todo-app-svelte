@@ -1,6 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store'
 
+  import { groups, type Group } from '$lib/store/groups'
   import { groupSchema } from '$lib/schemas/group'
   import { debounce } from '$lib/utils/debounce'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
@@ -48,7 +49,7 @@
   }
   const parseErrorDebounced = debounce(parseError)
 
-  const { execute, state: fetchState } = useFetchInternal('/api/group')
+  const { execute, state: fetchState } = useFetchInternal<Group>('/api/group')
   const submit = async () => {
     parseError('name', $formData.name.value)
     parseError('description', $formData.description.value)
@@ -64,6 +65,13 @@
         name: $formData.name.value,
         description: $formData.description.value,
       }),
+    })
+
+    groups.update((g) => {
+      if ($fetchState.response !== null) {
+        g.push($fetchState.response)
+      }
+      return g
     })
   }
 </script>

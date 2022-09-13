@@ -22,9 +22,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     },
   })
 
-  return jsonResponse({
-    data: insertedGroup,
-  })
+  return jsonResponse(insertedGroup)
 }
 
 // Find one or all Todo groups for user
