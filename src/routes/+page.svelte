@@ -49,7 +49,7 @@
     transform: translateX(-50%);
     padding-block: 1rem;
 
-    background-color: #FE8D85;
+    background-color: var(--error-clr);
     color: #FAFAFF;
   }
 

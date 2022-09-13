@@ -5,7 +5,7 @@
 </script>
 
 <header>
-  <h1>Todo App</h1>
+  <h2>Todo App</h2>
 
   <nav>
     <div class="container-fluid user-data">
@@ -61,6 +61,6 @@
     margin-left: 1.2rem;
 
     border-radius: 100%;
-    border: 2px solid var(--h6-color);
+    border: 1px solid var(--h6-color);
   }
 </style>

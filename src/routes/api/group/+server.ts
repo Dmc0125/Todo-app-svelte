@@ -1,26 +1,8 @@
-import { z } from 'zod'
-
 import type { RequestHandler } from './$types'
 import type { RequestLocals } from '$lib/hooks.server'
 import { prismaClient } from '$lib/utils/prisma'
 import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
-import { requiredError, typeError } from '$lib/utils/zod'
-
-const groupSchema = z.object({
-  name: z
-    .string({
-      required_error: requiredError('name'),
-      invalid_type_error: typeError('name', 'string'),
-    })
-    .min(1)
-    .max(100),
-  description: z
-    .string({
-      invalid_type_error: typeError('description', 'string'),
-    })
-    .max(300)
-    .default(''),
-})
+import { groupSchema } from '$lib/schemas/group'
 
 // Create Todo group
 export const POST: RequestHandler = async ({ request, locals }) => {
