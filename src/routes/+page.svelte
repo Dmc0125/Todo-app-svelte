@@ -3,7 +3,7 @@
   import { page } from '$app/stores'
   import { goto } from '$app/navigation'
 
-  import { PUBLIC_BASE_URL } from '$env/static/public';
+  import { PUBLIC_BASE_URL } from '$env/static/public'
 
   let showMessage = !!$page.url.searchParams.get('message')?.length
   onMount(() => {
@@ -25,15 +25,11 @@
 </header>
 
 {#if showMessage}
-  <article class="popup">
-    Unauthorized. You need to be signed in.
-  </article>
+  <article class="popup">Unauthorized. You need to be signed in.</article>
 {/if}
 
 <main class="container">
-  <a class="discord-login" role="button" href="/auth/login">
-    Login with Discord
-  </a>
+  <a class="discord-login" role="button" href="/auth/login"> Login with Discord </a>
 </main>
 
 <style>
@@ -50,7 +46,7 @@
     padding-block: 1rem;
 
     background-color: var(--error-clr);
-    color: #FAFAFF;
+    color: #fafaff;
   }
 
   main {

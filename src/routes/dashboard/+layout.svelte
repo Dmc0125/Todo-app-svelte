@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import type { PageData } from './$types'
 
   export let data: PageData
 </script>
@@ -14,12 +14,10 @@
       <img
         src="https://cdn.discordapp.com/avatars/{data.user.discord_id}/{data.user.avatar}.png"
         alt="{data.user.username} avatar"
-      >
+      />
     </div>
 
-    <a href="/auth/logout" role="button" class="outline secondary">
-      Logout
-    </a>
+    <a href="/auth/logout" role="button" class="outline secondary"> Logout </a>
   </nav>
 </header>
 
@@ -57,7 +55,7 @@
     --size: 2.5rem;
     width: var(--size);
     height: var(--size);
-    margin-right: .8rem;
+    margin-right: 0.8rem;
     margin-left: 1.2rem;
 
     border-radius: 100%;

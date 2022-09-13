@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ request }) => {
   if (!val) {
     return
   }
-  
+
   const [id, sig] = val.split('.')
   const isSigned = await verify(sig, id)
 

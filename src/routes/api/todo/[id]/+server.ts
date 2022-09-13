@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 import type { RequestHandler } from './$types'
 import { requiredError, typeError } from '$lib/utils/zod'
@@ -85,11 +84,11 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     ])
     return jsonResponse(todo)
   } catch (error) {
-    if (
-      error instanceof PrismaClientKnownRequestError &&
-      error.meta?.cause === 'Record to update not found.'
-    ) {
-      return errorResponse(AppError.notFound, 'Todo or todoGroup not found.')
+    if (error && 'meta' in error) {
+      const { meta } = error as { meta?: { cause: string } }
+      if (meta?.cause === 'Record to update not found.') {
+        return errorResponse(AppError.notFound, 'Todo or todoGroup not found.')
+      }
     }
     return errorResponse(AppError.unknown)
   }

@@ -34,8 +34,10 @@ export const useFetchInternal = <T = unknown>(url: string) => {
     try {
       setLoading(true)
       const res = await fetch(url, config)
-      const data = await res.json() as FetchInternalResponseSuccess<T> | FetchInternalResponseError
-  
+      const data = (await res.json()) as
+        | FetchInternalResponseSuccess<T>
+        | FetchInternalResponseError
+
       switch (data.success) {
         case true: {
           state.update((s) => {

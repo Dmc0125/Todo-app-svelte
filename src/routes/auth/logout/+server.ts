@@ -1,7 +1,7 @@
 import { PUBLIC_BASE_URL } from '$env/static/public'
 import type { RequestHandler } from './$types'
 
-export const GET: RequestHandler = () => (
+export const GET: RequestHandler = () =>
   new Response(null, {
     headers: {
       location: PUBLIC_BASE_URL,
@@ -10,4 +10,3 @@ export const GET: RequestHandler = () => (
     },
     status: 301,
   })
-)

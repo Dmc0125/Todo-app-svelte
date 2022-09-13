@@ -4,9 +4,7 @@
 
 <main class="container">
   <article class="groups">
-    <h4>
-      Todo groups
-    </h4>
+    <h4>Todo groups</h4>
 
     <section class="container-fluid todos">
       <div class="todo-card">
@@ -59,13 +57,13 @@
     border-radius: 0.25rem;
   }
 
-  :global([data-theme="dark"] .todo-card) {
+  :global([data-theme='dark'] .todo-card) {
     box-shadow: none !important;
     background-color: hsl(207, 31%, 14%);
   }
 
   .todo-card h6 {
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
   }
 
   .todo-card p {

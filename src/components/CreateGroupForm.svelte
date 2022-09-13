@@ -5,10 +5,13 @@
   import { debounce } from '$lib/utils/debounce'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
 
-  type FormData = Record<'name' | 'description', {
-    value: string
-    error: null | string
-  }>
+  type FormData = Record<
+    'name' | 'description',
+    {
+      value: string
+      error: null | string
+    }
+  >
 
   const formData = writable<FormData>({
     name: {
@@ -18,18 +21,17 @@
     description: {
       value: '',
       error: null,
-    }
+    },
   })
 
-  const parseError = (
-    pick: 'name' | 'description',
-    toParse: unknown,
-  ) => {
-    const result = groupSchema.pick({
-      [pick]: true,
-    }).safeParse({
-      [pick]: toParse,
-    })
+  const parseError = (pick: 'name' | 'description', toParse: unknown) => {
+    const result = groupSchema
+      .pick({
+        [pick]: true,
+      })
+      .safeParse({
+        [pick]: toParse,
+      })
     if (result.success) {
       formData.update((fd) => {
         fd[pick].error = null
@@ -40,10 +42,7 @@
 
     const err = result.error.errors[0]
     formData.update((fd) => {
-      fd[pick].error = err.message.replace(
-        /string/i,
-        `${pick[0].toUpperCase()}${pick.slice(1)}`,
-      )
+      fd[pick].error = err.message.replace(/string/i, `${pick[0].toUpperCase()}${pick.slice(1)}`)
       return fd
     })
   }
@@ -54,7 +53,7 @@
     parseError('name', $formData.name.value)
     parseError('description', $formData.description.value)
 
-    if ($formData.name.error || $formData.description.error) {      
+    if ($formData.name.error || $formData.description.error) {
       return
     }
 
@@ -64,23 +63,23 @@
       body: JSON.stringify({
         name: $formData.name.value,
         description: $formData.description.value,
-      })
+      }),
     })
   }
 </script>
 
-<form on:submit|preventDefault="{submit}">
-  <h4>Create Todo group</h4>  
+<form on:submit|preventDefault={submit}>
+  <h4>Create Todo group</h4>
 
   <label for="name">
     Name
     <input
       type="text"
       id="name"
-      class="{$formData.name.error ? 'error' : ''}"
-      bind:value="{$formData.name.value}"
-      on:input="{() => parseErrorDebounced('name', $formData.name.value)}"
-    >
+      class={$formData.name.error ? 'error' : ''}
+      bind:value={$formData.name.value}
+      on:input={() => parseErrorDebounced('name', $formData.name.value)}
+    />
     {#if $formData.name.error}
       <span class="error-message">{$formData.name.error}</span>
     {/if}
@@ -91,31 +90,35 @@
       Description
 
       <div class="info-icon" data-tooltip="Description is not required">
-        <svg
-          style="width: 1.2rem; height: 1.2rem"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 7.85786 16.1421 4.5 12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5Z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M11 15.5V12C11 11.7239 11.2239 11.5 11.5 11.5H12.5C12.7761 11.5 13 11.7239 13 12V15.5C13 15.7761 12.7761 16 12.5 16H11.5C11.2239 16 11 15.7761 11 15.5ZM12.9999 9C12.9999 9.55228 12.5522 10 11.9999 10C11.4476 10 10.9999 9.55228 10.9999 9C10.9999 8.44772 11.4476 8 11.9999 8C12.5522 8 12.9999 8.44772 12.9999 9Z" />
+        <svg style="width: 1.2rem; height: 1.2rem" viewBox="0 0 24 24" fill="none">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+            d="M12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 7.85786 16.1421 4.5 12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5Z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+            d="M11 15.5V12C11 11.7239 11.2239 11.5 11.5 11.5H12.5C12.7761 11.5 13 11.7239 13 12V15.5C13 15.7761 12.7761 16 12.5 16H11.5C11.2239 16 11 15.7761 11 15.5ZM12.9999 9C12.9999 9.55228 12.5522 10 11.9999 10C11.4476 10 10.9999 9.55228 10.9999 9C10.9999 8.44772 11.4476 8 11.9999 8C12.5522 8 12.9999 8.44772 12.9999 9Z"
+          />
         </svg>
       </div>
     </span>
     <input
       type="text"
       id="description"
-      class="{$formData.description.error ? 'error' : ''}"
-      bind:value="{$formData.description.value}"
-      on:input="{() => parseErrorDebounced('description', $formData.description.value)}"
-    >
+      class={$formData.description.error ? 'error' : ''}
+      bind:value={$formData.description.value}
+      on:input={() => parseErrorDebounced('description', $formData.description.value)}
+    />
     {#if $formData.description.error}
       <span class="error-message">{$formData.description.error}</span>
     {/if}
   </label>
 
-  <button type="submit" aria-busy="{$fetchState.loading}">
-    Create
-  </button>
+  <button type="submit" aria-busy={$fetchState.loading}> Create</button>
 </form>
 
 <style>
@@ -146,12 +149,12 @@
 
   .error-message {
     position: absolute;
-    bottom: -.25rem;
+    bottom: -0.25rem;
     left: 0;
     width: 100%;
 
-    font-size: .8rem;
-    color: #FE8D85;
+    font-size: 0.8rem;
+    color: #fe8d85;
   }
 
   button {
