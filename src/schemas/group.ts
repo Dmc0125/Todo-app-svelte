@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requiredError, typeError } from '$lib/utils/zod'
+import { idStrToNumSchema, requiredError, typeError } from '$lib/utils/zod'
 
 export const groupSchema = z.object({
   name: z
@@ -17,3 +17,12 @@ export const groupSchema = z.object({
     .max(300)
     .default(''),
 })
+
+const groupIdErrorMessages = {
+  required_error: requiredError('groupId'),
+  invalid_type_error: typeError('groupId', 'number'),
+}
+
+export const groupId = idStrToNumSchema(groupIdErrorMessages).or(
+  z.number(groupIdErrorMessages).min(1),
+)

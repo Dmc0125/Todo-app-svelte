@@ -1,19 +1,14 @@
 import { z } from 'zod'
 
 import type { RequestHandler } from './$types'
-import { requiredError, typeError } from '$lib/utils/zod'
 import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
-import { idStrToNumSchema } from '../utils'
 import { prismaClient } from '$lib/utils/prisma'
+import { groupId } from '$lib/schemas/group'
+import { todoId } from '$lib/schemas/todo'
 
 const getSchema = z.object({
-  todoId: idStrToNumSchema({
-    invalid_type_error: typeError('todoId', 'number'),
-  }),
-  groupId: idStrToNumSchema({
-    required_error: requiredError('groupId'),
-    invalid_type_error: typeError('groupId', 'number'),
-  }),
+  todoId,
+  groupId,
 })
 
 export const GET: RequestHandler = async ({ params, url }) => {
@@ -39,17 +34,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
   }
 }
 
-const setDoneSchema = z
-  .object({
-    done: z.boolean(),
-    groupId: z
-      .number({
-        required_error: requiredError('groupId'),
-        invalid_type_error: typeError('groupId', 'number'),
-      })
-      .min(1),
-  })
-  .merge(getSchema.pick({ todoId: true }))
+const setDoneSchema = z.object({
+  done: z.boolean(),
+  groupId,
+  todoId,
+})
 
 export const PUT: RequestHandler = async ({ request, params }) => {
   const body = await request.json()

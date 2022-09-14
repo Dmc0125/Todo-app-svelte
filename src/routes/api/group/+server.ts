@@ -50,3 +50,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return errorResponse(AppError.unknown)
   }
 }
+
+export const DELETE: RequestHandler = async ({ request }) => {
+  return new Response()
+}
