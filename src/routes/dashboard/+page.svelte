@@ -2,7 +2,8 @@
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
   import CreateGroupForm from '$lib/components/CreateGroupForm.svelte'
-  import ModalOverlay from '$lib/components/ModalOverlay.svelte'
+  import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
+  import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
 
   export let data: PageData
   groups.set(data.groups)
@@ -20,14 +21,18 @@
       <a role="button" href="?showModal=true" class="btn-small">Create group</a>
     </div>
 
-    <section class="container-fluid todos">
-      {#each $groups as { name, description, id }}
-        <a class="todo-card" href="/dashboard/group/{id}">
-          <h6>{name}</h6>
-          <p>{description}</p>
-        </a>
-      {/each}
-    </section>
+    {#if $groups.length}
+      <section class="container-fluid todos">
+        {#each $groups as { name, description, id }}
+          <a class="todo-card" href="/dashboard/group/{id}" data-sveltekit-prefetch>
+            <h6>{name}</h6>
+            <p>{description}</p>
+          </a>
+        {/each}
+      </section>
+    {:else}
+      <EmptyContainerLayout>All groups created by you will be shown here.</EmptyContainerLayout>
+    {/if}
   </article>
 </main>
 

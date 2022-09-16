@@ -63,8 +63,12 @@
 
   :global(.btn-small) {
     width: fit-content;
+    height: 2.5rem;
     margin-bottom: 0;
-    padding-block: 0.5rem;
+    padding-block: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .theme-switch {

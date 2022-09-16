@@ -1,10 +1,13 @@
 <script lang="ts">
-  import type { PageData } from './$types'
-  import { groups } from '$lib/store/groups'
-  import { page } from '$app/stores'
-  import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
+  import { page } from '$app/stores'
+
+  import type { PageData } from './$types'
+  import { groups } from '$lib/store/groups'
+  import { useFetchInternal } from '$lib/hooks/useFetchInternal'
+  import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
+  import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
 
   export let data: PageData
@@ -23,47 +26,67 @@
   onDestroy(unsubscribe)
 </script>
 
+<ModalOverlay>
+  <CreateTodoForm />
+</ModalOverlay>
+
 <main class="container">
-  {#if !group}
-    <article>
+  <article>
+    {#if !group}
       <h6 class="not-found-heading">
         Group with id {groupId} does not exist.
       </h6>
-    </article>
-  {:else if !data.todos.length}
-    <article class="form-wrapper container">
+    {:else}
       <div class="todo-header">
         <h3>
           {group.name}
         </h3>
 
-        <button
-          class="delete-btn"
-          on:click={deleteGroup}
-          aria-busy={$deleteGroupState.loading}
-        >
-          {#if !$deleteGroupState.loading}
-            <svg height="100%" viewBox="0 0 24 24" fill="none" style="aspect-ratio: 1">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke="currentColor"
-                d="M10.5 11.5V15.5M4.5 8.5H6.5H4.5ZM19.5 8.5H17.5H19.5ZM17.5 8.5V18.5C17.5 19.0523 17.0523 19.5 16.5 19.5H7.5C6.94771 19.5 6.5 19.0523 6.5 18.5V8.5H17.5ZM17.5 8.5H16H17.5ZM6.5 8.5H8H6.5ZM8 8.5V6.5C8 5.94772 8.44772 5.5 9 5.5H15C15.5523 5.5 16 5.94772 16 6.5V8.5H8ZM8 8.5H16H8ZM13.5 11.5V15.5V11.5Z"
-              />
-            </svg>
-          {/if}
-        </button>
+        <div class="todo-header-buttons">
+          <button
+            class="delete-btn btn-small"
+            on:click={deleteGroup}
+            aria-busy={$deleteGroupState.loading}
+          >
+            {#if !$deleteGroupState.loading}
+              <svg
+                height="60%"
+                viewBox="0 0 24 24"
+                fill="none"
+                style="aspect-ratio: 1"
+                stroke-width="1.2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke="currentColor"
+                  d="M10.5 11.5V15.5M4.5 8.5H6.5H4.5ZM19.5 8.5H17.5H19.5ZM17.5 8.5V18.5C17.5 19.0523 17.0523 19.5 16.5 19.5H7.5C6.94771 19.5 6.5 19.0523 6.5 18.5V8.5H17.5ZM17.5 8.5H16H17.5ZM6.5 8.5H8H6.5ZM8 8.5V6.5C8 5.94772 8.44772 5.5 9 5.5H15C15.5523 5.5 16 5.94772 16 6.5V8.5H8ZM8 8.5H16H8ZM13.5 11.5V15.5V11.5Z"
+                />
+              </svg>
+            {/if}
+            <span>Delete group</span>
+          </button>
+
+          <a role="button" class="primary btn-small" href="?showModal=true"> Create todo </a>
+        </div>
       </div>
-      <CreateTodoForm />
-    </article>
-  {:else}
-    <article>
-      {data.todos}
-    </article>
-  {/if}
+
+      {#if !data.todos.length}
+        <EmptyContainerLayout>
+          All todos created in this group will be shown here.
+        </EmptyContainerLayout>
+      {:else}
+        {data.todos}
+      {/if}
+    {/if}
+  </article>
 </main>
 
 <style>
+  article {
+    padding: 2rem;
+  }
+
   .not-found-heading {
     width: fit-content;
     margin-inline: auto;
@@ -82,23 +105,19 @@
     margin-bottom: 0;
   }
 
-  .form-wrapper {
-    max-width: 22rem;
-    --card-background-color: none;
-    --card-box-shadow: none;
+  .todo-header-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
   }
 
   .delete-btn {
     --border-color: none;
     --primary-focus: var(--error-shadow-clr);
-    --size: 2rem;
-    width: var(--size);
-    height: var(--size);
-    padding: .25rem;
-    margin: 0;
+    width: fit-content;
     background-color: var(--error-clr);
-    display: grid;
-    place-items: center;
+    gap: 0.25rem;
   }
 
   .delete-btn:hover {

@@ -1,18 +1,23 @@
-<script lang="ts">
-  import { onDestroy } from 'svelte'
-  import { fade } from 'svelte/transition'
-  import { goto } from '$app/navigation'
+<script lang="ts" context="module">
   import { page } from '$app/stores'
+  import { get } from 'svelte/store'
 
-  let show = false
-
-  const closeModal = () => {
-    goto(`${$page.url.origin}${$page.url.pathname}`, {
+  export const closeModal = () => {
+    const { origin, pathname } = get(page).url
+    goto(`${origin}${pathname}`, {
       keepfocus: true,
       replaceState: true,
       noscroll: true,
     })
   }
+</script>
+
+<script lang="ts">
+  import { onDestroy } from 'svelte'
+  import { fade } from 'svelte/transition'
+  import { goto } from '$app/navigation'
+
+  let show = false
 
   const unsub = page.subscribe((_page) => {
     if (_page.url.searchParams.get('showModal') === 'true') {
@@ -23,7 +28,15 @@
   })
 
   onDestroy(unsub)
+
+  const closeHandler = (e: KeyboardEvent & { currentTarget: EventTarget & Window }) => {
+    if (e.key === 'Escape') {
+      closeModal()
+    }
+  }
 </script>
+
+<svelte:window on:keydown={closeHandler} />
 
 {#if show}
   <div class="modal-overlay" on:click={closeModal} transition:fade={{ duration: 100 }}>
