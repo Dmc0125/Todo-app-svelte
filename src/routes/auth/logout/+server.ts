@@ -5,7 +5,7 @@ export const GET: RequestHandler = () =>
   new Response(null, {
     headers: {
       location: PUBLIC_BASE_URL,
-      'set-cookie': 'id=0; Max-Age=-1; Path=/',
+      'set-cookie': `id=0; Expires=${new Date().toString()}; Path=/`,
       'Cache-control': 'no-store',
     },
     status: 301,

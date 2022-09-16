@@ -16,7 +16,8 @@
   <article>
     <div class="groups-header">
       <h4>Todo groups</h4>
-      <a role="button" href="?showModal=true">Create group</a>
+
+      <a role="button" href="?showModal=true" class="btn-small">Create group</a>
     </div>
 
     <section class="container-fluid todos">
@@ -47,12 +48,6 @@
     margin-bottom: 0;
   }
 
-  .groups-header a {
-    width: fit-content;
-    margin-bottom: 0;
-    padding-block: 0.5rem;
-  }
-
   .todos {
     margin: 0;
     padding: 0;
@@ -62,11 +57,13 @@
   }
 
   .todo-card {
+    --text-decoration: none;
+
     height: 5.5rem;
     padding: 1rem;
     display: grid;
 
-    box-shadow: 0 0 10px 1px rgb(238, 238, 238);
+    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.05);
     border-radius: 0.25rem;
   }
 

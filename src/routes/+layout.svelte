@@ -52,11 +52,19 @@
     --font-family: 'Inter';
 
     --error-clr: hsl(4, 98%, 76%);
+    --error-hover-clr: hsl(4, 98%, 80%);
     --error-shadow-clr: hsl(4, 98%, 95%);
+    --error-text-clr: #fafaff;
   }
 
   :global([data-theme='dark']) {
     --error-shadow-clr: hsl(4, 98%, 65%, 0.4);
+  }
+
+  :global(.btn-small) {
+    width: fit-content;
+    margin-bottom: 0;
+    padding-block: 0.5rem;
   }
 
   .theme-switch {

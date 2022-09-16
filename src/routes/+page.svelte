@@ -46,7 +46,7 @@
     padding-block: 1rem;
 
     background-color: var(--error-clr);
-    color: #fafaff;
+    color: var(--error-text-clr);
   }
 
   main {

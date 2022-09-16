@@ -4,6 +4,7 @@ type FetchState<T> = {
   response: null | T
   loading: boolean
   error: null | string | string[]
+  executed: boolean
 }
 
 type FetchInternalResponseSuccess<T> = {
@@ -21,18 +22,19 @@ export const useFetchInternal = <T = unknown>(url: string) => {
     response: null,
     loading: false,
     error: null,
+    executed: false,
   })
 
-  const setLoading = (loading: boolean) => {
+  const setState = <Y extends keyof FetchState<T>>(prop: Y, value: FetchState<T>[Y]) => {
     state.update((s) => {
-      s.loading = loading
+      s[prop] = value
       return s
     })
   }
 
   const execute = async (config: RequestInit) => {
     try {
-      setLoading(true)
+      setState('loading', true)
       const res = await fetch(url, config)
       const data = (await res.json()) as
         | FetchInternalResponseSuccess<T>
@@ -40,26 +42,21 @@ export const useFetchInternal = <T = unknown>(url: string) => {
 
       switch (data.success) {
         case true: {
-          state.update((s) => {
-            s.response = data.data
-            return s
-          })
+          setState('response', data.data)
           break
         }
         case false: {
-          state.update((s) => {
-            s.error = data.error
-            return s
-          })
+          setState('error', data.error)
         }
       }
     } catch (error) {
-      state.update((s) => {
-        s.error = 'Unknown error.'
-        return s
-      })
+      setState('error', 'Unknown error.')
     }
-    setLoading(false)
+    state.update((s) => {
+      s.loading = false
+      s.executed = true
+      return s
+    })
   }
 
   return {
