@@ -5,14 +5,21 @@
 
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
+  import { todos } from '$lib/store/todos'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
 
   export let data: PageData
+
   let groupId = Number($page.params.groupId)
   let group = $groups.find(({ id }) => id === groupId)
+
+  todos.update((t) => {
+    t[groupId] = data.todos
+    return t
+  })
 
   const { execute, state: deleteGroupState } = useFetchInternal(`/api/group/${groupId}`)
   const deleteGroup = async () => {
@@ -27,7 +34,7 @@
 </script>
 
 <ModalOverlay>
-  <CreateTodoForm />
+  <CreateTodoForm {groupId} />
 </ModalOverlay>
 
 <main class="container">
@@ -76,7 +83,7 @@
           All todos created in this group will be shown here.
         </EmptyContainerLayout>
       {:else}
-        {data.todos}
+        {$todos[groupId]}
       {/if}
     {/if}
   </article>

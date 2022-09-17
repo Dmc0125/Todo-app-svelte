@@ -44,6 +44,7 @@
   }
 
   button {
+    margin-top: 1rem;
     margin-bottom: 0;
   }
 </style>
