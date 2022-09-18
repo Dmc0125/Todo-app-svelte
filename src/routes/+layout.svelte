@@ -59,6 +59,7 @@
 
   :global([data-theme='dark']) {
     --error-shadow-clr: hsl(4, 98%, 65%, 0.4);
+    --bg-card-clr: hsl(207, 31%, 14%);
   }
 
   :global(.btn-small) {

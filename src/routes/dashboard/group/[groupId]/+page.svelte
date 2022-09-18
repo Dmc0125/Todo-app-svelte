@@ -47,11 +47,22 @@
       <h6 class="not-found-heading">
         Group with id {groupId} does not exist.
       </h6>
+      <a role="button" href="/dashbard" class="secondary">
+        Go back to dashboard
+      </a>
     {:else}
       <div class="todo-header">
-        <h3>
-          {group.name}
-        </h3>
+        <nav class="todo-header-nav">
+          <a href="/dashboard" class="todo-header-back-btn" data-sveltekit-prefetch>
+            <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M19.5 12L4.5 12M4.5 12L11 18.5M4.5 12L11 5.5" />
+            </svg>
+          </a>
+
+          <h3>
+            {group.name}
+          </h3>
+        </nav>
 
         <div class="todo-header-buttons">
           <button
@@ -82,12 +93,19 @@
         </div>
       </div>
 
-      {#if !data.todos.length}
+      {#if !Object.values($todos).length}
         <EmptyContainerLayout>
           All todos created in this group will be shown here.
         </EmptyContainerLayout>
       {:else}
-        {$todos[groupId]}
+        <section class="container-fluid todos-container">
+          {#each $todos[groupId] as {title, content, done}}
+            <div class="todo-card">
+              <h6>{title}</h6>
+              <p>{content}</p>
+            </div>
+          {/each}
+        </section>
       {/if}
     {/if}
   </article>
@@ -112,8 +130,22 @@
     justify-content: space-between;
   }
 
-  .todo-header h3 {
+  .todo-header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .todo-header-nav h3 {
     margin-bottom: 0;
+  }
+
+  .todo-header-back-btn {
+    --size: 2rem;
+    width: var(--size);
+    height: var(--size);
+    padding: 0;
+    margin: 0;
   }
 
   .todo-header-buttons {
@@ -133,5 +165,27 @@
 
   .delete-btn:hover {
     background-color: var(--error-hover-clr);
+  }
+
+  .todos-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .todo-card {
+    padding: 1rem;
+
+    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.05);
+    border-radius: 0.25rem;
+  }
+
+  :global([data-theme='dark'] .todo-card) {
+    box-shadow: none !important;
+    background-color: var(--bg-card-clr);
+  }
+
+  .todo-card p, .todo-card h6 {
+    margin-bottom: 0;
   }
 </style>

@@ -22,9 +22,9 @@
     </div>
 
     {#if $groups.length}
-      <section class="container-fluid todos">
+      <section class="container-fluid groups">
         {#each $groups as { name, description, id }}
-          <a class="todo-card" href="/dashboard/group/{id}" data-sveltekit-prefetch>
+          <a class="group-card" href="/dashboard/group/{id}" data-sveltekit-prefetch>
             <h6>{name}</h6>
             <p>{description}</p>
           </a>
@@ -53,7 +53,7 @@
     margin-bottom: 0;
   }
 
-  .todos {
+  .groups {
     margin: 0;
     padding: 0;
     display: grid;
@@ -61,7 +61,7 @@
     gap: 1rem;
   }
 
-  .todo-card {
+  .group-card {
     --text-decoration: none;
 
     height: 5.5rem;
@@ -72,21 +72,21 @@
     border-radius: 0.25rem;
   }
 
-  :global([data-theme='dark'] .todo-card) {
+  :global([data-theme='dark'] .group-card) {
     box-shadow: none !important;
-    background-color: hsl(207, 31%, 14%);
+    background-color: var(--bg-card-clr);
   }
 
-  .todo-card:hover {
+  .group-card:hover {
     cursor: pointer;
     text-decoration: none;
   }
 
-  .todo-card h6 {
+  .group-card h6 {
     margin-bottom: 0.25rem;
   }
 
-  .todo-card p {
+  .group-card p {
     width: 100%;
     margin-bottom: 0;
     color: var(--h6-color);

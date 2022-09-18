@@ -62,7 +62,6 @@
         t[groupId] = [...(t[groupId] || []), todo]
         return t
       })
-
       closeModal()
     }
   }

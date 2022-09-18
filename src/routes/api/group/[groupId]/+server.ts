@@ -5,7 +5,7 @@ import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
 
 export const DELETE: RequestHandler = async ({ params }) => {
   const result = groupId.safeParse(params.groupId)
-  console.log(params)
+
   if (!result.success) {
     return errorResponse(AppError.validation, result.error)
   }
@@ -13,14 +13,14 @@ export const DELETE: RequestHandler = async ({ params }) => {
   try {
     const id = result.data
     await prismaClient.$transaction([
-      prismaClient.todoGroup.delete({
-        where: {
-          id,
-        },
-      }),
       prismaClient.todo.deleteMany({
         where: {
           groupId: id,
+        },
+      }),
+      prismaClient.todoGroup.delete({
+        where: {
+          id,
         },
       }),
     ])
