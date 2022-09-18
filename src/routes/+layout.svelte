@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Notification from '$lib/components/Notification.svelte'
+
   let theme: 'light' | 'dark' = 'light'
   const changeTheme = () => {
     const html = document.querySelector('html')
@@ -15,6 +17,8 @@
     }
   }
 </script>
+
+<Notification />
 
 <slot />
 
@@ -45,6 +49,10 @@
     font-family: 'Inter';
     src: url('/Inter-VariableFont_slnt,wght.ttf');
     font-weight: 100 1000;
+  }
+
+  :global(html) {
+    overflow-x: hidden;
   }
 
   :global(:root) {

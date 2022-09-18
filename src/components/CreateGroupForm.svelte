@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { TodoGroup } from '@prisma/client'
   import { writable } from 'svelte/store'
 
-  import { groups, type Group } from '$lib/store/groups'
+  import { groups } from '$lib/store/groups'
   import { groupSchema } from '$lib/schemas/group'
   import { debounce } from '$lib/utils/debounce'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { closeModal } from '$lib/layouts/ModalOverlay.svelte'
+  import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import FormLayout from '$lib/layouts/FormLayout.svelte'
   import FormLabelLayout from '$lib/layouts/FormLabelLayout.svelte'
   import CloseFormModalButton from './CloseFormModalButton.svelte'
@@ -53,7 +55,7 @@
   }
   const parseErrorDebounced = debounce(parseError)
 
-  const { execute, state: fetchState } = useFetchInternal<Group>('/api/group')
+  const { execute, state: fetchState } = useFetchInternal<TodoGroup>('/api/group')
   const submit = async () => {
     parseError('name', $formData.name.value)
     parseError('description', $formData.description.value)
@@ -62,7 +64,6 @@
       return
     }
 
-    // TODO: Notify about error
     await execute({
       method: 'POST',
       body: JSON.stringify({
@@ -71,13 +72,18 @@
       }),
     })
 
-    groups.update((g) => {
-      if ($fetchState.response !== null) {
-        g.push($fetchState.response)
-        closeModal()
-      }
-      return g
-    })
+    if ($fetchState.response !== null) {
+      groups.update((g) => {
+        g.push($fetchState.response!)
+        return g
+      })
+      closeModal()
+    } else {
+      showNotification({
+        content: serverErrorMessage,
+        status: 'error',
+      })
+    }
   }
 </script>
 

@@ -7,6 +7,7 @@
   import { groups } from '$lib/store/groups'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { todos } from '$lib/store/todos'
+  import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
@@ -28,9 +29,19 @@
   const { execute, state: deleteGroupState } = useFetchInternal(`/api/group/${groupId}`)
   const deleteGroup = async () => {
     await execute({ method: 'DELETE' })
+    if ($deleteGroupState.error) {
+      showNotification({
+        content: serverErrorMessage,
+        status: 'error',
+      })
+    }
   }
   const unsubscribe = deleteGroupState.subscribe((_state) => {
     if (_state.executed && !_state.error) {
+      showNotification({
+        content: `Group ${group?.name} was successfully deleted.`,
+        status: 'success',
+      })
       goto('/dashboard')
     }
   })

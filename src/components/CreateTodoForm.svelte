@@ -9,6 +9,7 @@
   import { titleSchema, contentSchema } from '$lib/schemas/todo'
   import { todos } from '$lib/store/todos'
   import { closeModal } from '$lib/layouts/ModalOverlay.svelte'
+  import { serverErrorMessage, showNotification } from '$lib/store/notification'
 
   const { execute, state: createTodoState } = useFetchInternal<Todo>('/api/todo')
 
@@ -63,6 +64,11 @@
         return t
       })
       closeModal()
+    } else {
+      showNotification({
+        content: serverErrorMessage,
+        status: 'error',
+      })
     }
   }
 </script>

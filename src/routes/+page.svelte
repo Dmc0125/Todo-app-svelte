@@ -1,32 +1,32 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { goto } from '$app/navigation'
-
+  import { browser } from '$app/environment'
+  
   import { PUBLIC_BASE_URL } from '$env/static/public'
+  import { showNotification } from '$lib/store/notification'
 
   let showMessage = !!$page.url.searchParams.get('message')?.length
-  onMount(() => {
-    if (showMessage) {
-      setTimeout(() => {
-        showMessage = false
-        goto(PUBLIC_BASE_URL, {
-          keepfocus: true,
-          replaceState: true,
-          noscroll: true,
-        })
-      }, 5000)
-    }
-  })
+  if (showMessage) {
+    showNotification({
+      content: 'Unauthorized. You need to be signed in.',
+      status: 'error',
+      onHide: () => {
+        if (browser) {
+          goto(PUBLIC_BASE_URL, {
+            keepfocus: true,
+            replaceState: true,
+            noscroll: true,
+          })
+        }
+      }
+    })
+  }
 </script>
 
 <header>
   <h1>Todo App</h1>
 </header>
-
-{#if showMessage}
-  <article class="popup">Unauthorized. You need to be signed in.</article>
-{/if}
 
 <main class="container">
   <a class="discord-login" role="button" href="/auth/login"> Login with Discord </a>
@@ -36,17 +36,6 @@
   header {
     display: grid;
     place-items: center;
-  }
-
-  .popup {
-    position: absolute;
-    left: 50%;
-    top: 10%;
-    transform: translateX(-50%);
-    padding-block: 1rem;
-
-    background-color: var(--error-clr);
-    color: var(--error-text-clr);
   }
 
   main {
