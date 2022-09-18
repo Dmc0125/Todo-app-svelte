@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { Todo } from '@prisma/client'
+
   import FormLayout from '../layouts/FormLayout.svelte'
   import FormLabelLayout from '../layouts/FormLabelLayout.svelte'
   import CloseFormModalButton from './CloseFormModalButton.svelte'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { useForm } from '$lib/hooks/useForm'
   import { titleSchema, contentSchema } from '$lib/schemas/todo'
-  import { todos, type Todo } from '$lib/store/todos'
+  import { todos } from '$lib/store/todos'
   import { closeModal } from '$lib/layouts/ModalOverlay.svelte'
 
   const { execute, state: createTodoState } = useFetchInternal<Todo>('/api/todo')
@@ -55,7 +57,7 @@
     })
 
     if ($createTodoState.response !== null) {
-      const { groupId: _, ...todo} = $createTodoState.response
+      const { groupId: _, ...todo } = $createTodoState.response
       todos.update((t) => {
         t[groupId] = [...(t[groupId] || []), todo]
         return t

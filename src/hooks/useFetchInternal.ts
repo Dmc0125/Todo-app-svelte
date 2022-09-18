@@ -17,6 +17,8 @@ type FetchInternalResponseError = {
   error: string | string[]
 }
 
+export type FetchResponse<T> = FetchInternalResponseError | FetchInternalResponseSuccess<T>
+
 export const useFetchInternal = <T = unknown>(url: string) => {
   const state = writable<FetchState<T>>({
     response: null,
@@ -36,9 +38,7 @@ export const useFetchInternal = <T = unknown>(url: string) => {
     try {
       setState('loading', true)
       const res = await fetch(url, config)
-      const data = (await res.json()) as
-        | FetchInternalResponseSuccess<T>
-        | FetchInternalResponseError
+      const data = (await res.json()) as FetchResponse<T>
 
       switch (data.success) {
         case true: {
