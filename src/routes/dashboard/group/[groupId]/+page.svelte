@@ -16,10 +16,10 @@
   let groupId = Number($page.params.groupId)
   let group = $groups.find(({ id }) => id === groupId)
 
-  todos.update((t) => {
-    t[groupId] = data.todos
-    return t
-  })
+  // todos.update((t) => {
+  //   t[groupId] = data.todos
+  //   return t
+  // })
 
   const { execute, state: deleteGroupState } = useFetchInternal(`/api/group/${groupId}`)
   const deleteGroup = async () => {
@@ -78,13 +78,13 @@
         </div>
       </div>
 
-      {#if !data.todos.length}
+      <!-- {#if !data.todos.length}
         <EmptyContainerLayout>
           All todos created in this group will be shown here.
         </EmptyContainerLayout>
       {:else}
         {$todos[groupId]}
-      {/if}
+      {/if} -->
     {/if}
   </article>
 </main>

@@ -40,6 +40,7 @@ export enum AppError {
   unknown = 'ServerError',
   validation = 'ValidationError',
   notFound = 'NotFoundError',
+  unauthorized = 'UnauthorizedError',
 }
 
 export const errorResponse = (error: AppError, message?: string | string[] | z.ZodError) => {
@@ -66,6 +67,14 @@ export const errorResponse = (error: AppError, message?: string | string[] | z.Z
       return jsonResponse(message || error, {
         init: {
           status: 404,
+        },
+        success: false,
+      })
+    }
+    case AppError.unauthorized: {
+      return jsonResponse(message || error, {
+        init: {
+          status: 401,
         },
         success: false,
       })

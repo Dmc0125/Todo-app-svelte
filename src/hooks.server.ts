@@ -2,32 +2,27 @@ import type { Cookies, Handle } from '@sveltejs/kit'
 
 import { PUBLIC_BASE_URL } from '$env/static/public'
 import { verify } from './utils/sign'
-import { redirectResponse } from './utils/response'
+import { AppError, errorResponse, redirectResponse } from './utils/response'
 
-const errorRedirect = redirectResponse(`${PUBLIC_BASE_URL}?message=Unauthorized`)
+const errorHandlers = new Map([
+  ['api', errorResponse(AppError.unauthorized)],
+  ['dashboard', redirectResponse(`${PUBLIC_BASE_URL}?message=Unauthorized`)],
+])
 
-const authorize = async (
-  cookies: Cookies,
-  onSuccess: (userId: string) => Promise<Response> | Response,
-) => {
+const parseAndVerifyCookie = async (cookies: Cookies) => {
   const idCookie = cookies.get('id')
-
   if (!idCookie || !idCookie.length) {
-    return errorRedirect
+    return null
   }
-
   const [id, sig] = idCookie.split('.')
   if (!id || !sig) {
-    return errorRedirect
+    return null
   }
-
   const isSigned = await verify(sig, id)
-
   if (!isSigned) {
-    return errorRedirect
+    return null
   }
-
-  return onSuccess(id)
+  return [id, sig] as [string, string]
 }
 
 export type RequestLocals = {
@@ -35,14 +30,16 @@ export type RequestLocals = {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  if (event.url.pathname.startsWith('/api') || event.url.pathname.startsWith('/dashboard')) {
-    return authorize(event.cookies, (userId) => {
-      event.locals = {
-        id: userId,
-      }
-      return resolve(event)
-    })
+  const cookie = await parseAndVerifyCookie(event.cookies)
+
+  if (!cookie) {
+    const path = event.url.pathname.split('/')[1]
+    const response = errorHandlers.get(path)
+    return response || resolve(event)
   }
 
+  event.locals = {
+    id: cookie[0],
+  }
   return resolve(event)
 }
