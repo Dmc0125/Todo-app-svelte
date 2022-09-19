@@ -24,7 +24,7 @@
     {#if $groups.length}
       <section class="container-fluid groups">
         {#each $groups as { name, description, id }}
-          <a class="group-card" href="/dashboard/group/{id}" data-sveltekit-prefetch>
+          <a class="group-card" href="/dashboard/group-{id}" data-sveltekit-prefetch>
             <h6>{name}</h6>
             <p>{description}</p>
           </a>
