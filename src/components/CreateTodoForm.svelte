@@ -86,6 +86,7 @@
     />
     <FormLabelLayout
       id="Content"
+      inputType="textArea"
       bind:value={$formState.todoContent.value}
       on:input={() => parseErrorDebounced('todoContent')}
       error={$formState.todoContent.error}

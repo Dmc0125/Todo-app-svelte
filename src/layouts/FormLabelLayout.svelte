@@ -5,6 +5,7 @@
   $: elId = id.toLowerCase()
   export let error: null | string = null
   export let value: string
+  export let inputType: 'input' | 'textArea' = 'input'
 
   const dispatch = createEventDispatcher()
   const input = () => {
@@ -22,7 +23,12 @@
     {id}
   {/if}
 
-  <input type="text" id={elId} class={error ? 'error' : ''} bind:value on:input={input} />
+  {#if inputType === 'input'}
+    <input type="text" id={elId} class={error ? 'error' : ''} bind:value on:input={input} />
+  {:else}
+    <textarea id={elId} class={error ? 'error' : ''} bind:value on:input={input} />
+  {/if}
+
   {#if error}
     <span class="error-message">{error}</span>
   {/if}
@@ -37,6 +43,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 70px;
+    max-height: 400px;
   }
 
   .error {

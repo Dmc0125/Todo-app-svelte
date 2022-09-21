@@ -84,6 +84,7 @@
     margin: 0;
     padding: 0.25rem;
     position: fixed;
+    z-index: 99999999;
 
     --size: 2.5rem;
     bottom: var(--size);

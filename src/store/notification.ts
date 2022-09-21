@@ -10,17 +10,13 @@ type NotificationData = {
 export const notifications = writable<Map<number, NotificationData>>(new Map())
 
 type Config = {
-  content: string,
-  status: 'error' | 'success',
+  content: string
+  status: 'error' | 'success'
   onHide?: () => void | Promise<void>
 }
 
 let id = 0
-export const showNotification = ({
-  content,
-  status,
-  onHide,
-}: Config) => {
+export const showNotification = ({ content, status, onHide }: Config) => {
   const _id = id
   notifications.update((n) => {
     if (n.size === 6) {

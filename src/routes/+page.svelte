@@ -2,7 +2,7 @@
   import { page } from '$app/stores'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
-  
+
   import { PUBLIC_BASE_URL } from '$env/static/public'
   import { showNotification } from '$lib/store/notification'
 
@@ -19,7 +19,7 @@
             noscroll: true,
           })
         }
-      }
+      },
     })
   }
 </script>

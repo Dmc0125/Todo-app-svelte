@@ -53,6 +53,7 @@
     background: rgba(0, 0, 0, 0.05);
     display: grid;
     place-items: center;
+    z-index: 1000;
   }
 
   :global([data-theme='dark'] .modal-overlay) {

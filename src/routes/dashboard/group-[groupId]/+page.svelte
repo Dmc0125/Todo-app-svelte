@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Todo } from '@prisma/client'
   import { onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
@@ -8,11 +9,13 @@
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { todos } from '$lib/store/todos'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
+  import { deleteStashedBatch } from '$lib/store/todos'
   import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import TodoCard from '$lib/components/TodoCard.svelte'
   import DeleteIcon from '$lib/components/DeleteIcon.svelte'
+  import ConfirmPopup from '$lib/components/ConfirmPopup.svelte'
 
   export let data: PageData
 
@@ -48,11 +51,62 @@
     }
   })
   onDestroy(unsubscribe)
+
+  onDestroy(() => {
+    deleteStashedBatch.set(null)
+  })
+  const { execute: executeBatchAction, state: batchActionState } =
+    useFetchInternal<Todo[]>('/api/todo')
+  const showBatchActionError = () => {
+    if ($batchActionState.error) {
+      console.log('SHOW ERROR', $batchActionState.error)
+      showNotification({
+        status: 'error',
+        content:
+          typeof $batchActionState.error === 'string'
+            ? $batchActionState.error
+            : $batchActionState.error.join('. '),
+      })
+    }
+  }
+  const deleteStashed = async () => {
+    await executeBatchAction({
+      method: 'DELETE',
+      body: JSON.stringify({
+        todoIds: [...$deleteStashedBatch!],
+      }),
+    })
+    showBatchActionError()
+    if ($batchActionState.response) {
+      todos.update((todosState) => {
+        if (!$batchActionState.response) {
+          return todosState
+        }
+
+        const deletedIds = $batchActionState.response.map(({ id }) => id)
+        const remaining = todosState[groupId].filter(({ id: todoId }) => {
+          return !deletedIds.includes(todoId)
+        })
+        todosState[groupId] = remaining
+        return todosState
+      })
+      deleteStashedBatch.set(null)
+    }
+  }
 </script>
 
 <ModalOverlay>
   <CreateTodoForm {groupId} />
 </ModalOverlay>
+
+<ConfirmPopup
+  saveLoading={$batchActionState.loading}
+  show={$deleteStashedBatch !== null}
+  on:cancel={() => deleteStashedBatch.set(null)}
+  on:save={deleteStashed}
+>
+  Are you sure you want to delete selected todos?
+</ConfirmPopup>
 
 <main class="container">
   <article>
@@ -60,15 +114,18 @@
       <h6 class="not-found-heading">
         Group with id {groupId} does not exist.
       </h6>
-      <a role="button" href="/dashbard" class="secondary">
-        Go back to dashboard
-      </a>
+      <a role="button" href="/dashboard" class="secondary back-btn"> Go back to dashboard </a>
     {:else}
       <div class="todo-header">
         <nav class="todo-header-nav">
           <a href="/dashboard" class="todo-header-back-btn" data-sveltekit-prefetch>
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M19.5 12L4.5 12M4.5 12L11 18.5M4.5 12L11 5.5" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke="currentColor"
+                d="M19.5 12L4.5 12M4.5 12L11 18.5M4.5 12L11 5.5"
+              />
             </svg>
           </a>
 
@@ -99,8 +156,8 @@
         </EmptyContainerLayout>
       {:else}
         <section class="container-fluid todos-container">
-          {#each $todos[groupId] as {title, content, done}}
-            <TodoCard {title} {content} {done} />
+          {#each $todos[groupId] as { title, content, done, id }}
+            <TodoCard {title} {content} {done} {id} />
           {/each}
         </section>
       {/if}
@@ -117,6 +174,13 @@
     width: fit-content;
     margin-inline: auto;
     margin-bottom: 0;
+    display: block;
+  }
+
+  .back-btn {
+    width: fit-content;
+    margin-top: 1rem;
+    margin-inline: auto;
     display: block;
   }
 
