@@ -7,9 +7,9 @@
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
-  import { todos } from '$lib/store/todos'
+  import { batchForComplete, todos } from '$lib/store/todos'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
-  import { deleteStashedBatch } from '$lib/store/todos'
+  import { batchForDelete } from '$lib/store/todos'
   import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
@@ -36,7 +36,8 @@
 
   enum PopupIds {
     Group = '0',
-    Todos = '1',
+    TodosDelete = '1',
+    TodosComplete = '2',
   }
 
   // --------- DELETE GROUP ---------
@@ -62,53 +63,104 @@
   })
   onDestroy(unsubscribe)
 
-  // --------- DELETE TOODS ---------
-  onDestroy(() => {
-    deleteStashedBatch.set(null)
-  })
-  const { execute: executeBatchAction, state: deleteTodosBatchState } =
+  const { execute: executeBatchAction, state: todosBatchActionState } =
     useFetchInternal<Todo[]>('/api/todo')
   const showBatchActionError = () => {
-    if ($deleteTodosBatchState.error) {
-      console.log('SHOW ERROR', $deleteTodosBatchState.error)
-      showNotification({
-        status: 'error',
-        content:
-          typeof $deleteTodosBatchState.error === 'string'
-            ? $deleteTodosBatchState.error
-            : $deleteTodosBatchState.error.join('. '),
-      })
-    }
+    showNotification({
+      status: 'error',
+      content:
+        typeof $todosBatchActionState.error === 'string'
+          ? $todosBatchActionState.error
+          : $todosBatchActionState.error!.join('. '),
+    })
   }
-  const deleteStashed = async () => {
+  // --------- DELETE TOODS ---------
+  onDestroy(() => {
+    batchForDelete.set(null)
+  })
+  const executeBatchDelete = async () => {
     await executeBatchAction({
       method: 'DELETE',
       body: JSON.stringify({
-        todoIds: [...$deleteStashedBatch!],
+        todoIds: [...$batchForDelete!],
       }),
     })
-    showBatchActionError()
-    if ($deleteTodosBatchState.response) {
+    if ($todosBatchActionState.error) {
+      showBatchActionError()
+    }
+    if ($todosBatchActionState.response) {
       todos.update((todosState) => {
-        if (!$deleteTodosBatchState.response) {
+        if (!$todosBatchActionState.response) {
           return todosState
         }
 
-        const deletedIds = $deleteTodosBatchState.response.map(({ id }) => id)
+        const deletedIds = $todosBatchActionState.response.map(({ id }) => id)
         const remaining = todosState[groupId].filter(({ id: todoId }) => {
           return !deletedIds.includes(todoId)
         })
         todosState[groupId] = remaining
         return todosState
       })
-      deleteStashedBatch.set(null)
+      batchForDelete.set(null)
     }
   }
 
   $: {
-    if (!$deleteStashedBatch) {
-      hideConfirmPopup(PopupIds.Todos)
+    if (!$batchForDelete) {
+      hideConfirmPopup(PopupIds.TodosDelete)
     }
+  }
+
+  // --------- COMPLETE TOODS ---------
+  onDestroy(() => {
+    batchForComplete.set(new Map())
+  })
+  const executeBatchComplete = async () => {
+    const body: Record<number, { done: boolean }> = {}
+    $batchForComplete.forEach((val, key) => {
+      body[key] = val
+    })
+
+    await executeBatchAction({
+      method: 'PUT',
+      body: JSON.stringify(body),
+    })
+
+    if ($todosBatchActionState.error) {
+      showBatchActionError()
+    }
+    const res = $todosBatchActionState.response
+    if (res) {
+      todos.update((todosState) => {
+        const newTodosState = todosState[groupId].reduce((acc, todo) => {
+          const changed = res.find(({ id }) => todo.id === id)
+          if (changed) {
+            return [
+              ...acc,
+              {
+                ...todo,
+                done: changed.done,
+              },
+            ]
+          }
+          return [...acc, todo]
+        }, [] as Omit<Todo, 'groupId'>[])
+        return {
+          ...todosState,
+          [groupId]: newTodosState,
+        }
+      })
+      batchForComplete.set(new Map())
+    }
+  }
+  $: {
+    if (!$batchForComplete.size) {
+      hideConfirmPopup(PopupIds.TodosComplete)
+    }
+  }
+
+  $: {
+    console.log($todos[groupId])
   }
 </script>
 
@@ -170,16 +222,31 @@
       {:else}
         <section class="container-fluid todos-container">
           {#each $todos[groupId] as { title, content, done, id }}
-            <TodoCard {title} {content} {done} {id} popupId={PopupIds.Todos} />
+            <TodoCard
+              {title}
+              {content}
+              {done}
+              {id}
+              popupId={PopupIds.TodosDelete}
+              completePopupId={PopupIds.TodosComplete}
+            />
           {/each}
         </section>
         <ConfirmPopup
-          loading={$deleteTodosBatchState.loading}
-          on:save={deleteStashed}
-          on:cancel={() => deleteStashedBatch.set(null)}
-          id={PopupIds.Todos}
+          loading={$todosBatchActionState.loading}
+          on:save={executeBatchDelete}
+          on:cancel={() => batchForDelete.set(null)}
+          id={PopupIds.TodosDelete}
         >
           Are you sure you want to delete selected todos?
+        </ConfirmPopup>
+        <ConfirmPopup
+          loading={$todosBatchActionState.loading}
+          on:save={executeBatchComplete}
+          on:cancel={() => batchForComplete.set(new Map())}
+          id={PopupIds.TodosComplete}
+        >
+          Are you sure you want to complete selected todos?
         </ConfirmPopup>
       {/if}
     {/if}

@@ -3,10 +3,10 @@ import { writable } from 'svelte/store'
 
 export const todos = writable<Record<number, Omit<Todo, 'groupId'>[]>>({})
 
-export type StashedForDelete = Set<number> | null
-export const deleteStashedBatch = writable<StashedForDelete | null>(null)
+export type BatchForDelete = Set<number> | null
+export const batchForDelete = writable<BatchForDelete | null>(null)
 export const addToDeleteBatch = (id: number) => {
-  deleteStashedBatch.update((ba) => {
+  batchForDelete.update((ba) => {
     if (!ba) {
       return new Set([id])
     }
@@ -15,7 +15,7 @@ export const addToDeleteBatch = (id: number) => {
   })
 }
 export const removeFromDeleteBatch = (id: number) => {
-  deleteStashedBatch.update((ba) => {
+  batchForDelete.update((ba) => {
     if (!ba) {
       throw Error('DeleteBatchActionStore is not defined')
     }
@@ -24,5 +24,20 @@ export const removeFromDeleteBatch = (id: number) => {
       return null
     }
     return ba
+  })
+}
+
+type BatchForComplete = Map<number, { done: boolean }>
+export const batchForComplete = writable<BatchForComplete>(new Map())
+export const addToCompleteBatch = (id: number, todoState: boolean) => {
+  batchForComplete.update((bc) => {
+    bc.set(id, { done: todoState })
+    return bc
+  })
+}
+export const removeFromCompleteBatch = (id: number) => {
+  batchForComplete.update((bc) => {
+    bc.delete(id)
+    return bc
   })
 }

@@ -1,6 +1,13 @@
 <script lang="ts">
   import DeleteIcon from './DeleteIcon.svelte'
-  import { addToDeleteBatch, removeFromDeleteBatch, deleteStashedBatch } from '$lib/store/todos'
+  import {
+    addToDeleteBatch,
+    removeFromDeleteBatch,
+    batchForDelete,
+    batchForComplete,
+    addToCompleteBatch,
+    removeFromCompleteBatch,
+  } from '$lib/store/todos'
   import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
 
   export let id: number
@@ -9,29 +16,42 @@
   export let done: boolean
 
   export let popupId: string
+  export let completePopupId: string
 
   const handleDeleteBtn = () => {
-    if (!$confirmPopupState.show && !$deleteStashedBatch) {
+    if (!$confirmPopupState.show && !$batchForDelete) {
       showConfirmPopup(popupId)
-    } else if ($confirmPopupState.show && !$deleteStashedBatch) {
+    } else if ($confirmPopupState.show && !$batchForDelete) {
       showConfirmPopup(popupId)
       return
     }
 
-    if ($deleteStashedBatch?.has(id)) {
+    if ($batchForDelete?.has(id)) {
       removeFromDeleteBatch(id)
     } else {
       addToDeleteBatch(id)
     }
   }
+
+  const handleCompleteBtn = () => {
+    if ($confirmPopupState.show !== completePopupId) {
+      showConfirmPopup(completePopupId)
+    }
+
+    if ($batchForComplete.get(id)) {
+      removeFromCompleteBatch(id)
+    } else {
+      addToCompleteBatch(id, !done)
+    }
+  }
 </script>
 
-<div class="todo-card {$deleteStashedBatch?.has(id) ? 'stashed-delete' : ''}">
+<div class="todo-card {$batchForDelete?.has(id) ? 'stashed-delete' : ''}">
   <div class="todo-header">
     <h6>{title}</h6>
 
     <div class="todo-header-bts">
-      <button class="done-btn btn" data-tooltip="Toggle done">
+      <button class="done-btn btn" on:click={handleCompleteBtn} data-tooltip="Toggle done">
         <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
           <path
             stroke-linecap="round"
