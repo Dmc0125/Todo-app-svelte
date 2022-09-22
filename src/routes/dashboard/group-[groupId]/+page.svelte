@@ -15,7 +15,10 @@
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import TodoCard from '$lib/components/TodoCard.svelte'
   import DeleteIcon from '$lib/components/DeleteIcon.svelte'
-  import ConfirmPopup from '$lib/components/ConfirmPopup.svelte'
+  import ConfirmPopup, {
+    showConfirmPopup,
+    hideConfirmPopup,
+  } from '$lib/components/ConfirmPopup.svelte'
 
   export let data: PageData
 
@@ -31,6 +34,12 @@
     return t
   })
 
+  enum PopupIds {
+    Group = '0',
+    Todos = '1',
+  }
+
+  // --------- DELETE GROUP ---------
   const { execute, state: deleteGroupState } = useFetchInternal(`/api/group/${groupId}`)
   const deleteGroup = async () => {
     await execute({ method: 'DELETE' })
@@ -43,6 +52,7 @@
   }
   const unsubscribe = deleteGroupState.subscribe((_state) => {
     if (_state.executed && !_state.error) {
+      hideConfirmPopup(PopupIds.Group)
       showNotification({
         content: `Group ${group?.name} was successfully deleted.`,
         status: 'success',
@@ -52,20 +62,21 @@
   })
   onDestroy(unsubscribe)
 
+  // --------- DELETE TOODS ---------
   onDestroy(() => {
     deleteStashedBatch.set(null)
   })
-  const { execute: executeBatchAction, state: batchActionState } =
+  const { execute: executeBatchAction, state: deleteTodosBatchState } =
     useFetchInternal<Todo[]>('/api/todo')
   const showBatchActionError = () => {
-    if ($batchActionState.error) {
-      console.log('SHOW ERROR', $batchActionState.error)
+    if ($deleteTodosBatchState.error) {
+      console.log('SHOW ERROR', $deleteTodosBatchState.error)
       showNotification({
         status: 'error',
         content:
-          typeof $batchActionState.error === 'string'
-            ? $batchActionState.error
-            : $batchActionState.error.join('. '),
+          typeof $deleteTodosBatchState.error === 'string'
+            ? $deleteTodosBatchState.error
+            : $deleteTodosBatchState.error.join('. '),
       })
     }
   }
@@ -77,13 +88,13 @@
       }),
     })
     showBatchActionError()
-    if ($batchActionState.response) {
+    if ($deleteTodosBatchState.response) {
       todos.update((todosState) => {
-        if (!$batchActionState.response) {
+        if (!$deleteTodosBatchState.response) {
           return todosState
         }
 
-        const deletedIds = $batchActionState.response.map(({ id }) => id)
+        const deletedIds = $deleteTodosBatchState.response.map(({ id }) => id)
         const remaining = todosState[groupId].filter(({ id: todoId }) => {
           return !deletedIds.includes(todoId)
         })
@@ -93,20 +104,17 @@
       deleteStashedBatch.set(null)
     }
   }
+
+  $: {
+    if (!$deleteStashedBatch) {
+      hideConfirmPopup(PopupIds.Todos)
+    }
+  }
 </script>
 
 <ModalOverlay>
   <CreateTodoForm {groupId} />
 </ModalOverlay>
-
-<ConfirmPopup
-  saveLoading={$batchActionState.loading}
-  show={$deleteStashedBatch !== null}
-  on:cancel={() => deleteStashedBatch.set(null)}
-  on:save={deleteStashed}
->
-  Are you sure you want to delete selected todos?
-</ConfirmPopup>
 
 <main class="container">
   <article>
@@ -137,14 +145,19 @@
         <div class="todo-header-buttons">
           <button
             class="delete-btn btn-small"
-            on:click={deleteGroup}
-            aria-busy={$deleteGroupState.loading}
+            on:click={() => showConfirmPopup(PopupIds.Group)}
+            type="button"
           >
-            {#if !$deleteGroupState.loading}
-              <DeleteIcon height="60%" />
-            {/if}
+            <DeleteIcon height="60%" />
             <span>Delete group</span>
           </button>
+          <ConfirmPopup
+            loading={$deleteGroupState.loading}
+            on:save={deleteGroup}
+            id={PopupIds.Group}
+          >
+            Are you sure you want to delete this group?
+          </ConfirmPopup>
 
           <a role="button" class="primary btn-small" href="?showModal=true"> Create todo </a>
         </div>
@@ -157,9 +170,17 @@
       {:else}
         <section class="container-fluid todos-container">
           {#each $todos[groupId] as { title, content, done, id }}
-            <TodoCard {title} {content} {done} {id} />
+            <TodoCard {title} {content} {done} {id} popupId={PopupIds.Todos} />
           {/each}
         </section>
+        <ConfirmPopup
+          loading={$deleteTodosBatchState.loading}
+          on:save={deleteStashed}
+          on:cancel={() => deleteStashedBatch.set(null)}
+          id={PopupIds.Todos}
+        >
+          Are you sure you want to delete selected todos?
+        </ConfirmPopup>
       {/if}
     {/if}
   </article>

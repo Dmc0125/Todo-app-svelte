@@ -1,13 +1,23 @@
 <script lang="ts">
   import DeleteIcon from './DeleteIcon.svelte'
   import { addToDeleteBatch, removeFromDeleteBatch, deleteStashedBatch } from '$lib/store/todos'
+  import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
 
   export let id: number
   export let title: string
   export let content: string
   export let done: boolean
 
+  export let popupId: string
+
   const handleDeleteBtn = () => {
+    if (!$confirmPopupState.show && !$deleteStashedBatch) {
+      showConfirmPopup(popupId)
+    } else if ($confirmPopupState.show && !$deleteStashedBatch) {
+      showConfirmPopup(popupId)
+      return
+    }
+
     if ($deleteStashedBatch?.has(id)) {
       removeFromDeleteBatch(id)
     } else {
