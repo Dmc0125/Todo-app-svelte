@@ -20,7 +20,7 @@
 </ModalOverlay>
 
 <main class="container">
-  <article>
+  <article class="card-border">
     <div class="groups-header">
       <h4>Todo groups</h4>
 
@@ -30,7 +30,7 @@
     {#if $groups.length}
       <section class="container-fluid groups">
         {#each $groups as { name, description, id }}
-          <a class="group-card" href="/dashboard/group-{id}" data-sveltekit-prefetch>
+          <a class="group-card card-border" href="/dashboard/group-{id}" data-sveltekit-prefetch>
             <h6>{name}</h6>
             <p>{truncate(description, { length: 22, separator: /[ ,]/ })}</p>
           </a>

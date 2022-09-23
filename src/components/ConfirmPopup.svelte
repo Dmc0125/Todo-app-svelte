@@ -49,7 +49,7 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { fly } from 'svelte/transition'
   import { page } from '$app/stores'
   import { beforeNavigate } from '$app/navigation'
@@ -139,7 +139,7 @@
 
   @keyframes shake {
     0% {
-      transform: translateX(calc(-5px -50%));
+      transform: translateX(calc(-5px - 50%));
     }
     25% {
       transform: translateX(calc(5px - 50%));

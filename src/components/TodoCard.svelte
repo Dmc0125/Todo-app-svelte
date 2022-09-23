@@ -11,6 +11,7 @@
     removeFromCompleteBatch,
   } from '$lib/store/todos'
   import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
+  import IconButton from './IconButton.svelte'
 
   export let id: number
   export let title: string
@@ -73,7 +74,7 @@
   }
 </script>
 
-<div class="todo-card">
+<div class="todo-card card-border">
   <button
     class="complete-btn {showDone ? 'complete-btn-done' : ''} {animationClassName}"
     on:click={handleCompleteBtn}
@@ -105,23 +106,30 @@
       {/if}
     </div>
 
-    <button
-      class="delete-btn"
-      on:click={handleDeleteBtn}
-      data-tooltip="Toggle delete"
-    >
-      <DeleteIcon height="100%" />
-    </button>
+    <div class="buttons">
+      <IconButton
+        el="button"
+        class="delete-btn"
+        on:click={handleDeleteBtn}
+        dataTooltip="Toggle delete"
+      >
+        <DeleteIcon height="100%" />
+      </IconButton>
+      <IconButton
+        class="maximize-btn "
+      >
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M4.5 4.5H8M4.5 4.5V8M4.5 4.5L9 9M19.5 8V4.5M19.5 4.5H16M19.5 4.5L15 9M4.5 16V19.5M4.5 19.5H8M4.5 19.5L9 15M19.5 19.5V16M19.5 19.5H16M19.5 19.5L15 15" />
+        </svg>
+      </IconButton>
+    </div>
   </div>
 </div>
 
 <style>
   .todo-card {
     padding: .5rem .75rem;
-
-    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.02);
     border-radius: 0.25rem;
-    border: 1px solid var(--muted-border-color);
 
     display: grid;
     grid-template-columns: auto 1fr;
@@ -197,25 +205,15 @@
     font-size: .85rem;
   }
 
-  .delete-btn {
-    width: fit-content;
-    height: 1.75rem;
-    padding: 0.1rem;
-    margin: 0;
-
-    --primary: rgba(0, 0, 0, 0);
-    --primary-hover: var(--error-clr);
-    --primary-focus: var(--error-shadow-clr);
-    color: var(--muted-color);
-    border: 0;
-
+  .buttons {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: .5rem;
   }
 
-  .delete-btn:focus, .delete-btn:hover {
-    color: var(--primary-inverse);
+  :global(.delete-btn) {
+    --primary-hover: var(--error-clr);
+    --primary-focus: var(--error-shadow-clr);
   }
 
   .completed-animation {

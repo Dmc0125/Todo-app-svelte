@@ -11,7 +11,7 @@
   export { className as class }
 </script>
 
-<form on:submit|preventDefault={submit} class={className}>
+<form on:submit|preventDefault={submit} class="{className}">
   <div class="form-header">
     <h5>
       <slot name="heading" />

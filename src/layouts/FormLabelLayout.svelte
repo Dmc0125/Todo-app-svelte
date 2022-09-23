@@ -24,9 +24,9 @@
   {/if}
 
   {#if inputType === 'input'}
-    <input type="text" id={elId} class={error ? 'error' : ''} bind:value on:input={input} />
+    <input type="text" id={elId} class="{error ? 'error' : ''}" bind:value on:input={input} />
   {:else}
-    <textarea id={elId} class={error ? 'error' : ''} bind:value on:input={input} />
+    <textarea id={elId} class="{error ? 'error' : ''}" bind:value on:input={input} />
   {/if}
 
   {#if error}
@@ -48,7 +48,11 @@
   textarea {
     resize: vertical;
     min-height: 70px;
-    max-height: 400px;
+    max-height: 200px;
+  }
+
+  input, textarea {
+    --border-color: var(--muted-border-color);
   }
 
   .error {

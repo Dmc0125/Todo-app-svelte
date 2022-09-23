@@ -169,7 +169,7 @@
 </ModalOverlay>
 
 <main class="container">
-  <article>
+  <article class="card-border">
     {#if !group}
       <h6 class="not-found-heading">
         Group with id {groupId} does not exist.

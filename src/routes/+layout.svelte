@@ -16,8 +16,8 @@
         break
       }
       case 'dark': {
-        localStorage.setItem('data-theme', 'light')
         html?.setAttribute('data-theme', 'light')
+        localStorage.setItem('data-theme', 'light')
       }
     }
   }
@@ -27,7 +27,7 @@
       const theme = localStorage.getItem('data-theme')
       if (theme) {
         const html = document.querySelector('html')
-        html?.setAttribute('data-theme', 'light')
+        html?.setAttribute('data-theme', theme)
       }
     }
   })
@@ -97,6 +97,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  :global(.card-border) {
+    border: 1px solid var(--muted-border-color);
+    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.02);
   }
 
   .theme-switch {
