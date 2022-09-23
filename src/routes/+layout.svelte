@@ -78,6 +78,9 @@
     --error-hover-clr: hsl(4, 98%, 70%);
     --error-shadow-clr: hsl(4, 98%, 95%);
     --error-text-clr: #fafaff;
+
+    --success-clr: hsl(100, 59%, 60%);
+    --success-shadow-clr: hsl(100, 59%, 60%, .3);
   }
 
   :global([data-theme='dark']) {

@@ -60,47 +60,58 @@
   }
 
   $: isSetForDelete = $batchForDelete.has(id)
-  $: showDoneLabel = (!done && $batchForComplete.has(id)) || (done && !$batchForComplete.has(id))
+  $: showDone = (!done && $batchForComplete.has(id)) || (done && !$batchForComplete.has(id))
+
+  let animationClassName = ''
+  $: {
+    if (showDone) {
+      animationClassName = 'completed-animation'
+      setTimeout(() => {
+        animationClassName = ''
+      }, 200)
+    }
+  }
 </script>
 
 <div class="todo-card">
-  <div class="todo-header">
-    <h6>{title}</h6>
+  <button
+    class="complete-btn {showDone ? 'complete-btn-done' : ''} {animationClassName}"
+    on:click={handleCompleteBtn}
+    data-tooltip="Toggle done"
+  >
+    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke="currentColor"
+        d="m4.5 12 5 5 10-10"
+      />
+    </svg>
+  </button>
 
-    <div class="todo-header-bts">
-      <button class="done-btn btn" on:click={handleCompleteBtn} data-tooltip="Toggle done">
-        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke="currentColor"
-            d="m4.5 12 5 5 10-10"
-          />
-        </svg>
-      </button>
-
-      <button
-        class="delete-btn btn outline"
-        on:click={handleDeleteBtn}
-        data-tooltip="Toggle delete"
-      >
-        <DeleteIcon height="100%" />
-      </button>
-    </div>
+  <div class="todo-text-content">
+    <h6>{truncate(title, { length: 22, separator: /[ ,]/ })}</h6>
+    <p>{truncate(content, { length: 22, separator: /[ ,]/ })}</p>
   </div>
-  <p>{truncate(content, { length: 22, separator: /[ ,]/ })}</p>
 
-  <div class="todo-labels">
-    {#if isSetForDelete}
-      <div class="todo-label todo-label-delete">
-        <span>Delete</span>
-      </div>
-    {/if}
-    {#if showDoneLabel}
-      <div class="todo-label todo-label-completed">
-        <span>Done</span>
-      </div>
-    {/if}
+  <div class="todo-card-footer">
+    <div class="labels">
+      {#if isSetForDelete}
+        <div class="label label-delete">
+          <span>Delete</span>
+        </div>
+      {:else}
+        <span>No labels</span>
+      {/if}
+    </div>
+
+    <button
+      class="delete-btn"
+      on:click={handleDeleteBtn}
+      data-tooltip="Toggle delete"
+    >
+      <DeleteIcon height="100%" />
+    </button>
   </div>
 </div>
 
@@ -108,9 +119,15 @@
   .todo-card {
     padding: .5rem .75rem;
 
-    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.05);
+    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.02);
     border-radius: 0.25rem;
-    border: 1px solid rgba(0, 0, 0, 0);
+    border: 1px solid var(--muted-border-color);
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: .65rem
   }
 
   :global([data-theme='dark']) .todo-card {
@@ -118,41 +135,28 @@
     background-color: var(--bg-card-clr);
   }
 
-  .todo-labels {
-    --height: 1.35rem;
-
-    width: 100%;
-    min-height: var(--height);
-    margin-top: .25rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: .5rem;
-  }
-
-  .todo-label {
+  .label {
     width: fit-content;
-    height: var(--height);
     padding-inline: .5rem;
+    padding-block: .1rem;
     display: grid;
     place-content: center;
     border-radius: .25rem;
   }
 
-  .todo-label span {
+  .label span {
     display: block;
     height: 1.25rem;
     font-size: .85rem;
   }
 
-  .todo-label-completed {
-    background-color: #85D55D;
+  .label-delete {
+    background-color: var(--error-clr);
     color: var(--primary-inverse);
   }
 
-  .todo-label-delete {
-    background-color: var(--error-clr);
-    color: var(--primary-inverse);
+  .todo-text-content {
+    width: 100%;
   }
 
   p,
@@ -160,33 +164,73 @@
     margin-bottom: 0;
   }
 
-  .todo-header {
+  .complete-btn {
+    --primary-focus: var(--success-shadow-clr);
+    --size: 2.5rem;
+
+    width: var(--size);
+    height: var(--size);
+    margin: 0;
+    padding: .25rem;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+    border: 0 solid var(--muted-border-color);
+    background-color: var(--muted-border-color);
+  }
+
+  .complete-btn-done {
+    background-color: var(--success-clr);
+  }
+
+  .todo-card-footer {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+  }
+
+  .labels {
     width: 100%;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
 
-  .todo-header-bts {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .labels span {
+    font-size: .85rem;
   }
 
-  .btn {
+  .delete-btn {
     width: fit-content;
-    height: 1.6rem;
+    height: 1.75rem;
     padding: 0.1rem;
     margin: 0;
+
+    --primary: rgba(0, 0, 0, 0);
+    --primary-hover: var(--error-clr);
+    --primary-focus: var(--error-shadow-clr);
+    color: var(--muted-color);
+    border: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .delete-btn {
-    --border-color: var(--error-clr);
-    --primary-focus: var(--error-shadow-clr);
-    color: var(--error-clr);
+  .delete-btn:focus, .delete-btn:hover {
+    color: var(--primary-inverse);
+  }
+
+  .completed-animation {
+    animation: complete 200ms ease-in;
+  }
+
+  @keyframes complete {
+    from {
+      transform: scale(100%);
+    }
+    50% {
+      transform: scale(105%);
+    }
+    to {
+      transform: scale(100%);
+    }
   }
 </style>

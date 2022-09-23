@@ -24,6 +24,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Home</title>
+</svelte:head>
+
 <header>
   <h1>Todo App</h1>
 </header>

@@ -11,6 +11,10 @@
   groups.set(data.groups)
 </script>
 
+<svelte:head>
+  <title>Dashboard</title>
+</svelte:head>
+
 <ModalOverlay>
   <CreateGroupForm />
 </ModalOverlay>

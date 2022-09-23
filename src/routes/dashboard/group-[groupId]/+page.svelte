@@ -158,11 +158,11 @@
       hideConfirmPopup(PopupIds.TodosComplete)
     }
   }
-
-  $: {
-    console.log($todos[groupId])
-  }
 </script>
+
+<svelte:head>
+  <title>{group?.name || ''} &bull; Todos</title>
+</svelte:head>
 
 <ModalOverlay>
   <CreateTodoForm {groupId} />
