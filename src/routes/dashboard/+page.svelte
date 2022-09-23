@@ -1,4 +1,6 @@
 <script lang="ts">
+  import truncate from 'lodash.truncate'
+
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
   import CreateGroupForm from '$lib/components/CreateGroupForm.svelte'
@@ -26,7 +28,7 @@
         {#each $groups as { name, description, id }}
           <a class="group-card" href="/dashboard/group-{id}" data-sveltekit-prefetch>
             <h6>{name}</h6>
-            <p>{description}</p>
+            <p>{truncate(description, { length: 22, separator: /[ ,]/ })}</p>
           </a>
         {/each}
       </section>

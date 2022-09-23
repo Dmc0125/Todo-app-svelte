@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
+  import { onMount } from 'svelte'
+
   import Notification from '$lib/components/Notification.svelte'
 
   let theme: 'light' | 'dark' = 'light'
@@ -9,13 +12,25 @@
     switch (currentTheme) {
       case 'light': {
         html?.setAttribute('data-theme', 'dark')
+        localStorage.setItem('data-theme', 'dark')
         break
       }
       case 'dark': {
+        localStorage.setItem('data-theme', 'light')
         html?.setAttribute('data-theme', 'light')
       }
     }
   }
+
+  onMount(() => {
+    if (browser) {
+      const theme = localStorage.getItem('data-theme')
+      if (theme) {
+        const html = document.querySelector('html')
+        html?.setAttribute('data-theme', 'light')
+      }
+    }
+  })
 </script>
 
 <Notification />
@@ -60,12 +75,13 @@
     --font-family: 'Inter';
 
     --error-clr: hsl(4, 98%, 76%);
-    --error-hover-clr: hsl(4, 98%, 80%);
+    --error-hover-clr: hsl(4, 98%, 70%);
     --error-shadow-clr: hsl(4, 98%, 95%);
     --error-text-clr: #fafaff;
   }
 
   :global([data-theme='dark']) {
+    --error-hover-clr: hsl(4, 98%, 80%);
     --error-shadow-clr: hsl(4, 98%, 65%, 0.4);
     --bg-card-clr: hsl(207, 31%, 14%);
   }

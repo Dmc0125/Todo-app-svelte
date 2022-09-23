@@ -1,4 +1,6 @@
 <script lang="ts">
+  import truncate from 'lodash.truncate'
+
   import DeleteIcon from './DeleteIcon.svelte'
   import {
     addToDeleteBatch,
@@ -15,38 +17,53 @@
   export let content: string
   export let done: boolean
 
-  export let popupId: string
+  export let deletePopupId: string
   export let completePopupId: string
 
-  const handleDeleteBtn = () => {
-    if (!$confirmPopupState.show && !$batchForDelete) {
-      showConfirmPopup(popupId)
-    } else if ($confirmPopupState.show && !$batchForDelete) {
-      showConfirmPopup(popupId)
-      return
+  const action = {
+    delete: () => {
+      if ($batchForDelete.has(id)) {
+        removeFromDeleteBatch(id)
+      } else {
+        addToDeleteBatch(id)
+      }
+    },
+    complete: () => {
+      if ($batchForComplete.get(id)) {
+        removeFromCompleteBatch(id)
+      } else {
+        addToCompleteBatch(id, !done)
+      }
     }
+  }
 
-    if ($batchForDelete?.has(id)) {
-      removeFromDeleteBatch(id)
-    } else {
-      addToDeleteBatch(id)
+  const handleDeleteBtn = () => {
+    switch ($confirmPopupState.show) {
+      case deletePopupId: {
+        action.delete()
+        return
+      }
+      case null: action.delete()
+      default: showConfirmPopup(deletePopupId)
     }
   }
 
   const handleCompleteBtn = () => {
-    if ($confirmPopupState.show !== completePopupId) {
-      showConfirmPopup(completePopupId)
-    }
-
-    if ($batchForComplete.get(id)) {
-      removeFromCompleteBatch(id)
-    } else {
-      addToCompleteBatch(id, !done)
+    switch ($confirmPopupState.show) {
+      case completePopupId: {
+        action.complete()
+        return
+      }
+      case null: action.complete()
+      default: showConfirmPopup(completePopupId)
     }
   }
+
+  $: isSetForDelete = $batchForDelete.has(id)
+  $: showDoneLabel = (!done && $batchForComplete.has(id)) || (done && !$batchForComplete.has(id))
 </script>
 
-<div class="todo-card {$batchForDelete?.has(id) ? 'stashed-delete' : ''}">
+<div class="todo-card">
   <div class="todo-header">
     <h6>{title}</h6>
 
@@ -71,12 +88,25 @@
       </button>
     </div>
   </div>
-  <p>{content}</p>
+  <p>{truncate(content, { length: 22, separator: /[ ,]/ })}</p>
+
+  <div class="todo-labels">
+    {#if isSetForDelete}
+      <div class="todo-label todo-label-delete">
+        <span>Delete</span>
+      </div>
+    {/if}
+    {#if showDoneLabel}
+      <div class="todo-label todo-label-completed">
+        <span>Done</span>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
   .todo-card {
-    padding: 1rem;
+    padding: .5rem .75rem;
 
     box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.05);
     border-radius: 0.25rem;
@@ -88,12 +118,41 @@
     background-color: var(--bg-card-clr);
   }
 
-  .selected-batch-complete {
-    border: 1px solid hsl(138, 51%, 56%);
+  .todo-labels {
+    --height: 1.35rem;
+
+    width: 100%;
+    min-height: var(--height);
+    margin-top: .25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: .5rem;
   }
 
-  .stashed-delete {
-    border: 1px solid var(--error-clr);
+  .todo-label {
+    width: fit-content;
+    height: var(--height);
+    padding-inline: .5rem;
+    display: grid;
+    place-content: center;
+    border-radius: .25rem;
+  }
+
+  .todo-label span {
+    display: block;
+    height: 1.25rem;
+    font-size: .85rem;
+  }
+
+  .todo-label-completed {
+    background-color: #85D55D;
+    color: var(--primary-inverse);
+  }
+
+  .todo-label-delete {
+    background-color: var(--error-clr);
+    color: var(--primary-inverse);
   }
 
   p,
@@ -123,11 +182,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .done-btn {
-    /* --primary: hsl(138, 51%, 56%);
-    --primary-hover: hsl(138, 51%, 62%); */
   }
 
   .delete-btn {

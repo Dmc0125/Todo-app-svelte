@@ -76,7 +76,7 @@
   }
   // --------- DELETE TOODS ---------
   onDestroy(() => {
-    batchForDelete.set(null)
+    batchForDelete.set(new Set())
   })
   const executeBatchDelete = async () => {
     await executeBatchAction({
@@ -101,12 +101,12 @@
         todosState[groupId] = remaining
         return todosState
       })
-      batchForDelete.set(null)
+      batchForDelete.set(new Set())
     }
   }
 
   $: {
-    if (!$batchForDelete) {
+    if (!$batchForDelete.size) {
       hideConfirmPopup(PopupIds.TodosDelete)
     }
   }
@@ -227,7 +227,7 @@
               {content}
               {done}
               {id}
-              popupId={PopupIds.TodosDelete}
+              deletePopupId={PopupIds.TodosDelete}
               completePopupId={PopupIds.TodosComplete}
             />
           {/each}
@@ -235,7 +235,7 @@
         <ConfirmPopup
           loading={$todosBatchActionState.loading}
           on:save={executeBatchDelete}
-          on:cancel={() => batchForDelete.set(null)}
+          on:cancel={() => batchForDelete.set(new Set())}
           id={PopupIds.TodosDelete}
         >
           Are you sure you want to delete selected todos?
