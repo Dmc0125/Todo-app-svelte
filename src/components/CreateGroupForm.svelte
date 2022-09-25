@@ -6,7 +6,7 @@
   import { groupSchema } from '$lib/schemas/group'
   import { debounce } from '$lib/utils/debounce'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
-  import { closeModal } from '$lib/layouts/ModalOverlay.svelte'
+  import ModalOverlay, { closeModal } from '$lib/layouts/ModalOverlay.svelte'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import FormLayout from '$lib/layouts/FormLayout.svelte'
   import FormLabelLayout from '$lib/layouts/FormLabelLayout.svelte'
@@ -20,7 +20,7 @@
     }
   >
 
-  const formData = writable<FormData>({
+  const defaultData = () => ({
     name: {
       value: '',
       error: null,
@@ -30,6 +30,8 @@
       error: null,
     },
   })
+
+  const formData = writable<FormData>(defaultData())
 
   const parseError = (pick: 'name' | 'description', toParse: unknown) => {
     const result = groupSchema
@@ -87,44 +89,46 @@
   }
 </script>
 
-<article>
-  <FormLayout loading={$fetchState.loading} on:submit={submit}>
-    <svelte:fragment slot="heading">Create Group</svelte:fragment>
-    <CloseFormModalButton slot="header" />
-
-    <FormLabelLayout
-      id="Name"
-      bind:value={$formData.name.value}
-      error={$formData.name.error}
-      on:input={() => parseErrorDebounced('name', $formData.name.value)}
-    />
-    <FormLabelLayout
-      id="Description"
-      bind:value={$formData.description.value}
-      error={$formData.description.error}
-      on:input={() => parseErrorDebounced('description', $formData.description.value)}
-    >
-      <div class="info-icon" data-tooltip="Description is not required" slot="label">
-        <svg style="width: 1.2rem; height: 1.2rem" viewBox="0 0 24 24" fill="none">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke="currentColor"
-            d="M12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 7.85786 16.1421 4.5 12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5Z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke="currentColor"
-            d="M11 15.5V12C11 11.7239 11.2239 11.5 11.5 11.5H12.5C12.7761 11.5 13 11.7239 13 12V15.5C13 15.7761 12.7761 16 12.5 16H11.5C11.2239 16 11 15.7761 11 15.5ZM12.9999 9C12.9999 9.55228 12.5522 10 11.9999 10C11.4476 10 10.9999 9.55228 10.9999 9C10.9999 8.44772 11.4476 8 11.9999 8C12.5522 8 12.9999 8.44772 12.9999 9Z"
-          />
-        </svg>
-      </div>
-    </FormLabelLayout>
-
-    <svelte:fragment slot="submit-btn">Create</svelte:fragment>
-  </FormLayout>
-</article>
+<ModalOverlay on:close={() => $formData = defaultData()}>
+  <article>
+    <FormLayout loading={$fetchState.loading} on:submit={submit}>
+      <svelte:fragment slot="heading">Create Group</svelte:fragment>
+      <CloseFormModalButton slot="header" />
+  
+      <FormLabelLayout
+        id="Name"
+        bind:value={$formData.name.value}
+        error={$formData.name.error}
+        on:input={() => parseErrorDebounced('name', $formData.name.value)}
+      />
+      <FormLabelLayout
+        id="Description"
+        bind:value={$formData.description.value}
+        error={$formData.description.error}
+        on:input={() => parseErrorDebounced('description', $formData.description.value)}
+      >
+        <div class="info-icon" data-tooltip="Description is not required" slot="label">
+          <svg style="width: 1.2rem; height: 1.2rem" viewBox="0 0 24 24" fill="none">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke="currentColor"
+              d="M12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 7.85786 16.1421 4.5 12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5Z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke="currentColor"
+              d="M11 15.5V12C11 11.7239 11.2239 11.5 11.5 11.5H12.5C12.7761 11.5 13 11.7239 13 12V15.5C13 15.7761 12.7761 16 12.5 16H11.5C11.2239 16 11 15.7761 11 15.5ZM12.9999 9C12.9999 9.55228 12.5522 10 11.9999 10C11.4476 10 10.9999 9.55228 10.9999 9C10.9999 8.44772 11.4476 8 11.9999 8C12.5522 8 12.9999 8.44772 12.9999 9Z"
+            />
+          </svg>
+        </div>
+      </FormLabelLayout>
+  
+      <svelte:fragment slot="submit-btn">Create</svelte:fragment>
+    </FormLayout>
+  </article>
+</ModalOverlay>
 
 <style>
   .info-icon {

@@ -1,16 +1,9 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-
   export let id: string
   $: elId = id.toLowerCase()
   export let error: null | string = null
   export let value: string
   export let inputType: 'input' | 'textArea' = 'input'
-
-  const dispatch = createEventDispatcher()
-  const input = () => {
-    dispatch('input')
-  }
 </script>
 
 <label for={elId}>
@@ -24,9 +17,9 @@
   {/if}
 
   {#if inputType === 'input'}
-    <input type="text" id={elId} class="{error ? 'error' : ''}" bind:value on:input={input} />
+    <input type="text" id={elId} class="{error ? 'error' : ''}" bind:value on:input />
   {:else}
-    <textarea id={elId} class="{error ? 'error' : ''}" bind:value on:input={input} />
+    <textarea id={elId} class="{error ? 'error' : ''}" bind:value on:input />
   {/if}
 
   {#if error}
@@ -53,6 +46,10 @@
 
   input, textarea {
     --border-color: var(--muted-border-color);
+  }
+
+  textarea:focus {
+    border: 1px solid var(--primary);
   }
 
   .error {

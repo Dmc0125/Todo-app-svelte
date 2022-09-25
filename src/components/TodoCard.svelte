@@ -1,7 +1,8 @@
 <script lang="ts">
   import truncate from 'lodash.truncate'
+  import { page } from '$app/stores'
 
-  import DeleteIcon from './DeleteIcon.svelte'
+  import DeleteIcon from './icons/DeleteIcon.svelte'
   import {
     addToDeleteBatch,
     removeFromDeleteBatch,
@@ -108,7 +109,6 @@
 
     <div class="buttons">
       <IconButton
-        el="button"
         class="delete-btn"
         on:click={handleDeleteBtn}
         dataTooltip="Toggle delete"
@@ -116,7 +116,9 @@
         <DeleteIcon height="100%" />
       </IconButton>
       <IconButton
-        class="maximize-btn "
+        el="a"
+        href="{$page.url.pathname}/todo-{id}"
+        class="maximize-btn"
       >
         <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M4.5 4.5H8M4.5 4.5V8M4.5 4.5L9 9M19.5 8V4.5M19.5 4.5H16M19.5 4.5L15 9M4.5 16V19.5M4.5 19.5H8M4.5 19.5L9 15M19.5 19.5V16M19.5 19.5H16M19.5 19.5L15 15" />
@@ -208,12 +210,16 @@
   .buttons {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: .25rem;
   }
 
   :global(.delete-btn) {
     --primary-hover: var(--error-clr);
     --primary-focus: var(--error-shadow-clr);
+  }
+
+  :global(.maximize-btn:hover, .maximize-btn:focus) {
+    background-color: var(--primary-hover);
   }
 
   .completed-animation {

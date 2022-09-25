@@ -27,6 +27,18 @@ export const useForm = <State extends FormStateConfig>(defaultState: State) => {
 
   const state = writable(stateObj)
 
+  const clearForm = () => {
+    state.update((s) => {
+      Object.entries(stateObj).forEach(([prop]) => {
+        s[prop as keyof State] = {
+          value: defaultState[prop].value,
+          error: null,
+        }
+      })
+      return s
+    })
+  }
+
   const parseError = (prop: keyof State) => {
     const parse = errorParsers.get(prop)
 
@@ -50,6 +62,7 @@ export const useForm = <State extends FormStateConfig>(defaultState: State) => {
 
   return {
     state,
+    clearForm,
     parseError,
     parseErrorDebounced,
   }

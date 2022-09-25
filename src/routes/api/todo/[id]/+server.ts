@@ -82,3 +82,49 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     return errorResponse(AppError.unknown)
   }
 }
+
+export const DELETE: RequestHandler = async ({ params }) => {
+  const result = todoId.safeParse(params.id)
+  if (!result.success) {
+    return errorResponse(AppError.validation, result.error)
+  }
+
+  const id = result.data
+
+  try {
+    const todo = await prismaClient.todo.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    if (!todo) {
+      return errorResponse(AppError.notFound, `Todo with id ${id} does not exist`)
+    }
+
+
+    const groupChange = todo.done
+      ? {
+        todosCount: { decrement: 1 },
+        todosCompleted: { decrement: 1 },
+      }
+      : { todosCount: { decrement: 1 } }
+
+    const response = await prismaClient.$transaction([
+      prismaClient.todo.delete({
+        where: {
+          id: result.data,
+        },
+      }),
+      prismaClient.todoGroup.update({
+        where: {
+          id: todo.groupId,
+        },
+        data: groupChange,
+      }),
+    ])
+    return jsonResponse(response)
+  } catch (error) {
+    return errorResponse(AppError.unknown)
+  }
+}

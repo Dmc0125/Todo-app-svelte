@@ -89,6 +89,19 @@
     --bg-card-clr: hsl(207, 31%, 14%);
   }
 
+  :global(article) {
+    padding: 2rem;
+  }
+
+  :global(input, textarea) {
+    --border-color: var(--muted-border-color);
+  }
+
+  :global(textarea:focus) {
+    border: 1px solid var(--primary);
+  }
+
+
   :global(.btn-small) {
     width: fit-content;
     height: 2.5rem;

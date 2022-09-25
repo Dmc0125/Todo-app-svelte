@@ -10,15 +10,15 @@
   import { batchForComplete, todos } from '$lib/store/todos'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import { batchForDelete } from '$lib/store/todos'
-  import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import TodoCard from '$lib/components/TodoCard.svelte'
-  import DeleteIcon from '$lib/components/DeleteIcon.svelte'
+  import ArrowLeft from '$lib/components/icons/ArrowLeftIcon.svelte'
   import ConfirmPopup, {
     showConfirmPopup,
     hideConfirmPopup,
   } from '$lib/components/ConfirmPopup.svelte'
+  import DeleteButton from '$lib/components/buttons/DeleteButton.svelte'
 
   export let data: PageData
 
@@ -65,15 +65,16 @@
 
   const { execute: executeBatchAction, state: todosBatchActionState } =
     useFetchInternal<Todo[]>('/api/todo')
-  const showBatchActionError = () => {
-    showNotification({
-      status: 'error',
-      content:
-        typeof $todosBatchActionState.error === 'string'
-          ? $todosBatchActionState.error
-          : $todosBatchActionState.error!.join('. '),
-    })
+
+  $: {
+    if ($todosBatchActionState.error) {
+      showNotification({
+        status: 'error',
+        content: $todosBatchActionState.error,
+      })
+    }
   }
+
   // --------- DELETE TOODS ---------
   onDestroy(() => {
     batchForDelete.set(new Set())
@@ -85,9 +86,6 @@
         todoIds: [...$batchForDelete!],
       }),
     })
-    if ($todosBatchActionState.error) {
-      showBatchActionError()
-    }
     if ($todosBatchActionState.response) {
       todos.update((todosState) => {
         if (!$todosBatchActionState.response) {
@@ -126,9 +124,6 @@
       body: JSON.stringify(body),
     })
 
-    if ($todosBatchActionState.error) {
-      showBatchActionError()
-    }
     const res = $todosBatchActionState.response
     if (res) {
       todos.update((todosState) => {
@@ -164,9 +159,7 @@
   <title>{group?.name || ''} &bull; Todos</title>
 </svelte:head>
 
-<ModalOverlay>
-  <CreateTodoForm {groupId} />
-</ModalOverlay>
+<CreateTodoForm {groupId} />
 
 <main class="container">
   <article class="card-border">
@@ -179,14 +172,7 @@
       <div class="todo-header">
         <nav class="todo-header-nav">
           <a href="/dashboard" class="todo-header-back-btn" data-sveltekit-prefetch>
-            <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke="currentColor"
-                d="M19.5 12L4.5 12M4.5 12L11 18.5M4.5 12L11 5.5"
-              />
-            </svg>
+            <ArrowLeft />
           </a>
 
           <h3>
@@ -195,14 +181,9 @@
         </nav>
 
         <div class="todo-header-buttons">
-          <button
-            class="delete-btn btn-small"
-            on:click={() => showConfirmPopup(PopupIds.Group)}
-            type="button"
-          >
-            <DeleteIcon height="60%" />
-            <span>Delete group</span>
-          </button>
+          <DeleteButton on:click={() => showConfirmPopup(PopupIds.Group)}>
+            Delete group
+          </DeleteButton>
           <ConfirmPopup
             loading={$deleteGroupState.loading}
             on:save={deleteGroup}
@@ -254,10 +235,6 @@
 </main>
 
 <style>
-  article {
-    padding: 2rem;
-  }
-
   .not-found-heading {
     width: fit-content;
     margin-inline: auto;
@@ -302,18 +279,6 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-  }
-
-  .delete-btn {
-    --border-color: none;
-    --primary-focus: var(--error-shadow-clr);
-    width: fit-content;
-    background-color: var(--error-clr);
-    gap: 0.25rem;
-  }
-
-  .delete-btn:hover {
-    background-color: var(--error-hover-clr);
   }
 
   .todos-container {

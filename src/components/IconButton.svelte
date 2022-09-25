@@ -15,6 +15,7 @@
   let className = ''
   export { className as class }
   export let dataTooltip: string | undefined = undefined
+  export let style = ''
 </script>
 
 <svelte:element
@@ -24,6 +25,8 @@
   on:click="{dispatchClick}"
   data-tooltip={dataTooltip}
   {type}
+  {style}
+  data-sveltekit-prefetch={el === 'a' ? '' : 'off'}
 >
   <slot />
 </svelte:element>
@@ -38,6 +41,7 @@
     --primary: rgba(0, 0, 0, 0);
     color: var(--muted-color);
     border: 0;
+    border-radius: var(--border-radius);
 
     display: flex;
     align-items: center;
@@ -47,5 +51,9 @@
 
   .icon-btn:focus, .icon-btn:hover {
     color: var(--primary-inverse);
+  }
+
+  .icon-btn:focus {
+    box-shadow: 0 0 0 var(--outline-width) var(--primary-focus);
   }
 </style>

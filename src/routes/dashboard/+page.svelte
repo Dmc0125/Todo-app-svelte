@@ -4,7 +4,6 @@
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
   import CreateGroupForm from '$lib/components/CreateGroupForm.svelte'
-  import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
 
   export let data: PageData
@@ -15,9 +14,7 @@
   <title>Dashboard</title>
 </svelte:head>
 
-<ModalOverlay>
-  <CreateGroupForm />
-</ModalOverlay>
+<CreateGroupForm />
 
 <main class="container">
   <article class="card-border">
@@ -43,10 +40,6 @@
 </main>
 
 <style>
-  article {
-    padding: 2rem 2rem;
-  }
-
   .groups-header {
     margin-bottom: 2rem;
 
@@ -74,7 +67,6 @@
     padding: 1rem;
     display: grid;
 
-    box-shadow: 0 0 10px 1px rgb(0, 0, 0, 0.05);
     border-radius: 0.25rem;
   }
 

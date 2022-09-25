@@ -3,7 +3,7 @@ import { writable } from 'svelte/store'
 type FetchState<T> = {
   response: null | T
   loading: boolean
-  error: null | string | string[]
+  error: null | string
   executed: boolean
 }
 
@@ -46,7 +46,7 @@ export const useFetchInternal = <T = unknown>(url: string) => {
           break
         }
         case false: {
-          setState('error', data.error)
+          setState('error', typeof data.error === 'string' ? data.error : data.error.join('. '))
         }
       }
     } catch (error) {

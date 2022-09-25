@@ -8,7 +8,7 @@
   import { useForm } from '$lib/hooks/useForm'
   import { titleSchema, contentSchema } from '$lib/schemas/todo'
   import { todos } from '$lib/store/todos'
-  import { closeModal } from '$lib/layouts/ModalOverlay.svelte'
+  import ModalOverlay, { closeModal } from '$lib/layouts/ModalOverlay.svelte'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
 
   const { execute, state: createTodoState } = useFetchInternal<Todo>('/api/todo')
@@ -27,14 +27,15 @@
     parseError,
     parseErrorDebounced,
     state: formState,
+    clearForm,
   } = useForm({
     todoTitle: {
       value: '',
-      errorParser: (v) => parse('todoTitle', v),
+      errorParser: (v: string) => parse('todoTitle', v),
     },
     todoContent: {
       value: '',
-      errorParser: (v) => parse('todoContent', v),
+      errorParser: (v: string) => parse('todoContent', v),
     },
   })
 
@@ -73,25 +74,35 @@
   }
 </script>
 
-<article>
-  <FormLayout on:submit={createTodo} loading={$createTodoState.loading}>
-    <svelte:fragment slot="heading">Create Todo</svelte:fragment>
-    <CloseFormModalButton slot="header" />
-
-    <FormLabelLayout
-      id="Title"
-      bind:value={$formState.todoTitle.value}
-      on:input={() => parseErrorDebounced('todoTitle')}
-      error={$formState.todoTitle.error}
-    />
-    <FormLabelLayout
-      id="Content"
-      inputType="textArea"
-      bind:value={$formState.todoContent.value}
-      on:input={() => parseErrorDebounced('todoContent')}
-      error={$formState.todoContent.error}
-    />
-
-    <svelte:fragment slot="submit-btn">Submit</svelte:fragment>
-  </FormLayout>
-</article>
+<ModalOverlay on:close={clearForm}>
+  <article>
+    <FormLayout on:submit={createTodo} loading={$createTodoState.loading}>
+      <svelte:fragment slot="heading">Create Todo</svelte:fragment>
+      <CloseFormModalButton slot="header" />
+  
+      <FormLabelLayout
+        id="Title"
+        bind:value={$formState.todoTitle.value}
+        on:input={(e) => {
+          if (e) {
+            parseErrorDebounced('todoTitle')
+          }
+        }}
+        error={$formState.todoTitle.error}
+      />
+      <FormLabelLayout
+        id="Content"
+        inputType="textArea"
+        bind:value={$formState.todoContent.value}
+        on:input={(e) => {
+          if (e) {
+            parseErrorDebounced('todoContent')
+          }
+        }}
+        error={$formState.todoContent.error}
+      />
+  
+      <svelte:fragment slot="submit-btn">Submit</svelte:fragment>
+    </FormLayout>
+  </article>
+</ModalOverlay>
