@@ -22,7 +22,7 @@
   this={el}
   class="icon-btn {className}"
   href={el === 'a' ? href : undefined}
-  on:click="{dispatchClick}"
+  on:click={dispatchClick}
   data-tooltip={dataTooltip}
   {type}
   {style}
@@ -49,7 +49,8 @@
     flex-shrink: 0;
   }
 
-  .icon-btn:focus, .icon-btn:hover {
+  .icon-btn:focus,
+  .icon-btn:hover {
     color: var(--primary-inverse);
   }
 

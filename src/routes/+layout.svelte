@@ -80,7 +80,7 @@
     --error-text-clr: #fafaff;
 
     --success-clr: hsl(100, 59%, 60%);
-    --success-shadow-clr: hsl(100, 59%, 60%, .3);
+    --success-shadow-clr: hsl(100, 59%, 60%, 0.3);
   }
 
   :global([data-theme='dark']) {
@@ -100,7 +100,6 @@
   :global(textarea:focus) {
     border: 1px solid var(--primary);
   }
-
 
   :global(.btn-small) {
     width: fit-content;

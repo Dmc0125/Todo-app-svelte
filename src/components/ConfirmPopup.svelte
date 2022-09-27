@@ -16,7 +16,7 @@
     if (ps.error) {
       return false
     }
-    if (ps.show) {
+    if (ps.show && ps.show !== id) {
       confirmPopupState.update((ps) => {
         ps.error = true
         return ps

@@ -89,12 +89,12 @@
   }
 </script>
 
-<ModalOverlay on:close={() => $formData = defaultData()}>
+<ModalOverlay on:close={() => ($formData = defaultData())}>
   <article>
     <FormLayout loading={$fetchState.loading} on:submit={submit}>
       <svelte:fragment slot="heading">Create Group</svelte:fragment>
       <CloseFormModalButton slot="header" />
-  
+
       <FormLabelLayout
         id="Name"
         bind:value={$formData.name.value}
@@ -124,7 +124,7 @@
           </svg>
         </div>
       </FormLabelLayout>
-  
+
       <svelte:fragment slot="submit-btn">Create</svelte:fragment>
     </FormLayout>
   </article>

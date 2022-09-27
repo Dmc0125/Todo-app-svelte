@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import { page } from '$app/stores'
   import { get } from 'svelte/store'
-  
+
   export const closeModal = () => {
     const { origin, pathname } = get(page).url
     goto(`${origin}${pathname}`, {
@@ -25,6 +25,7 @@
 
   const unsub = page.subscribe((_page) => {
     if (_page.url.searchParams.get('showModal') === 'true') {
+      dispatch('show')
       show = true
     } else {
       dispatch('close')

@@ -27,7 +27,6 @@
     parseError,
     parseErrorDebounced,
     state: formState,
-    clearForm,
   } = useForm({
     todoTitle: {
       value: '',
@@ -39,11 +38,22 @@
     },
   })
 
+  const clearForm = () => {
+    $formState.todoTitle = {
+      value: '',
+      error: null,
+    }
+    $formState.todoContent = {
+      value: '',
+      error: null,
+    }
+  }
+
   export let groupId: number
 
   const createTodo = async () => {
-    parseError('todoTitle')
-    parseError('todoContent')
+    parseError('todoTitle', $formState.todoTitle.value)
+    parseError('todoContent', $formState.todoContent.value)
 
     if ($formState.todoTitle.error || $formState.todoContent.error) {
       return
@@ -64,6 +74,7 @@
         t[groupId] = [...(t[groupId] || []), todo]
         return t
       })
+      clearForm()
       closeModal()
     } else {
       showNotification({
@@ -79,29 +90,21 @@
     <FormLayout on:submit={createTodo} loading={$createTodoState.loading}>
       <svelte:fragment slot="heading">Create Todo</svelte:fragment>
       <CloseFormModalButton slot="header" />
-  
+
       <FormLabelLayout
         id="Title"
         bind:value={$formState.todoTitle.value}
-        on:input={(e) => {
-          if (e) {
-            parseErrorDebounced('todoTitle')
-          }
-        }}
+        on:input={(e) => parseErrorDebounced('todoTitle', e)}
         error={$formState.todoTitle.error}
       />
       <FormLabelLayout
         id="Content"
         inputType="textArea"
         bind:value={$formState.todoContent.value}
-        on:input={(e) => {
-          if (e) {
-            parseErrorDebounced('todoContent')
-          }
-        }}
+        on:input={(e) => parseErrorDebounced('todoContent', e)}
         error={$formState.todoContent.error}
       />
-  
+
       <svelte:fragment slot="submit-btn">Submit</svelte:fragment>
     </FormLayout>
   </article>

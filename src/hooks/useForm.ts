@@ -27,24 +27,11 @@ export const useForm = <State extends FormStateConfig>(defaultState: State) => {
 
   const state = writable(stateObj)
 
-  const clearForm = () => {
-    state.update((s) => {
-      Object.entries(stateObj).forEach(([prop]) => {
-        s[prop as keyof State] = {
-          value: defaultState[prop].value,
-          error: null,
-        }
-      })
-      return s
-    })
-  }
-
-  const parseError = (prop: keyof State) => {
+  const parseError = (prop: keyof State, value: string) => {
     const parse = errorParsers.get(prop)
 
     if (parse) {
-      const _state = get(state)
-      const error = parse(_state[prop].value)
+      const error = parse(value)
       state.update((s) => {
         if (error) {
           s[prop].error = error.errors[0].message.replace(
@@ -58,11 +45,15 @@ export const useForm = <State extends FormStateConfig>(defaultState: State) => {
       })
     }
   }
-  const parseErrorDebounced = debounce(parseError)
+  const parseErrorDebounced = debounce((prop: keyof State, e: Event) => {
+    if (e.target) {
+      const { value } = e.target as HTMLInputElement
+      parseError(prop, value)
+    }
+  })
 
   return {
     state,
-    clearForm,
     parseError,
     parseErrorDebounced,
   }

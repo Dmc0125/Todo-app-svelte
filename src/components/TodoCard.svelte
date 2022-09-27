@@ -13,6 +13,7 @@
   } from '$lib/store/todos'
   import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
   import IconButton from './IconButton.svelte'
+  import CompleteButton from './buttons/CompleteButton.svelte'
 
   export let id: number
   export let title: string
@@ -36,7 +37,7 @@
       } else {
         addToCompleteBatch(id, !done)
       }
-    }
+    },
   }
 
   const handleDeleteBtn = () => {
@@ -45,8 +46,10 @@
         action.delete()
         return
       }
-      case null: action.delete()
-      default: showConfirmPopup(deletePopupId)
+      case null:
+        action.delete()
+      default:
+        showConfirmPopup(deletePopupId)
     }
   }
 
@@ -56,40 +59,19 @@
         action.complete()
         return
       }
-      case null: action.complete()
-      default: showConfirmPopup(completePopupId)
+      case null:
+        action.complete()
+      default:
+        showConfirmPopup(completePopupId)
     }
   }
 
   $: isSetForDelete = $batchForDelete.has(id)
   $: showDone = (!done && $batchForComplete.has(id)) || (done && !$batchForComplete.has(id))
-
-  let animationClassName = ''
-  $: {
-    if (showDone) {
-      animationClassName = 'completed-animation'
-      setTimeout(() => {
-        animationClassName = ''
-      }, 200)
-    }
-  }
 </script>
 
 <div class="todo-card card-border">
-  <button
-    class="complete-btn {showDone ? 'complete-btn-done' : ''} {animationClassName}"
-    on:click={handleCompleteBtn}
-    data-tooltip="Toggle done"
-  >
-    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke="currentColor"
-        d="m4.5 12 5 5 10-10"
-      />
-    </svg>
-  </button>
+  <CompleteButton on:click={handleCompleteBtn} {showDone} />
 
   <div class="todo-text-content">
     <h6>{truncate(title, { length: 22, separator: /[ ,]/ })}</h6>
@@ -108,20 +90,17 @@
     </div>
 
     <div class="buttons">
-      <IconButton
-        class="delete-btn"
-        on:click={handleDeleteBtn}
-        dataTooltip="Toggle delete"
-      >
+      <IconButton class="delete-btn" on:click={handleDeleteBtn} dataTooltip="Toggle delete">
         <DeleteIcon height="100%" />
       </IconButton>
-      <IconButton
-        el="a"
-        href="{$page.url.pathname}/todo-{id}"
-        class="maximize-btn"
-      >
+      <IconButton el="a" href="{$page.url.pathname}/todo-{id}" class="maximize-btn">
         <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" d="M4.5 4.5H8M4.5 4.5V8M4.5 4.5L9 9M19.5 8V4.5M19.5 4.5H16M19.5 4.5L15 9M4.5 16V19.5M4.5 19.5H8M4.5 19.5L9 15M19.5 19.5V16M19.5 19.5H16M19.5 19.5L15 15" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+            d="M4.5 4.5H8M4.5 4.5V8M4.5 4.5L9 9M19.5 8V4.5M19.5 4.5H16M19.5 4.5L15 9M4.5 16V19.5M4.5 19.5H8M4.5 19.5L9 15M19.5 19.5V16M19.5 19.5H16M19.5 19.5L15 15"
+          />
         </svg>
       </IconButton>
     </div>
@@ -130,14 +109,14 @@
 
 <style>
   .todo-card {
-    padding: .5rem .75rem;
+    padding: 0.5rem 0.75rem;
     border-radius: 0.25rem;
 
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
     column-gap: 1rem;
-    row-gap: .65rem
+    row-gap: 0.65rem;
   }
 
   :global([data-theme='dark']) .todo-card {
@@ -147,17 +126,17 @@
 
   .label {
     width: fit-content;
-    padding-inline: .5rem;
-    padding-block: .1rem;
+    padding-inline: 0.5rem;
+    padding-block: 0.1rem;
     display: grid;
     place-content: center;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
   }
 
   .label span {
     display: block;
     height: 1.25rem;
-    font-size: .85rem;
+    font-size: 0.85rem;
   }
 
   .label-delete {
@@ -174,25 +153,6 @@
     margin-bottom: 0;
   }
 
-  .complete-btn {
-    --primary-focus: var(--success-shadow-clr);
-    --size: 2.5rem;
-
-    width: var(--size);
-    height: var(--size);
-    margin: 0;
-    padding: .25rem;
-    flex-shrink: 0;
-
-    border-radius: 50%;
-    border: 0 solid var(--muted-border-color);
-    background-color: var(--muted-border-color);
-  }
-
-  .complete-btn-done {
-    background-color: var(--success-clr);
-  }
-
   .todo-card-footer {
     grid-column: 1 / -1;
     display: flex;
@@ -204,13 +164,13 @@
   }
 
   .labels span {
-    font-size: .85rem;
+    font-size: 0.85rem;
   }
 
   .buttons {
     display: flex;
     align-items: center;
-    gap: .25rem;
+    gap: 0.25rem;
   }
 
   :global(.delete-btn) {
@@ -220,21 +180,5 @@
 
   :global(.maximize-btn:hover, .maximize-btn:focus) {
     background-color: var(--primary-hover);
-  }
-
-  .completed-animation {
-    animation: complete 200ms ease-in;
-  }
-
-  @keyframes complete {
-    from {
-      transform: scale(100%);
-    }
-    50% {
-      transform: scale(105%);
-    }
-    to {
-      transform: scale(100%);
-    }
   }
 </style>

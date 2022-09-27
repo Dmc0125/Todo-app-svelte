@@ -16,6 +16,6 @@
 
 <style>
   :global(.close-btn) {
-    --secondary: rgba(0, 0, 0, 0); 
+    --secondary: rgba(0, 0, 0, 0);
   }
 </style>

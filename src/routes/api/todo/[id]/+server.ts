@@ -102,12 +102,11 @@ export const DELETE: RequestHandler = async ({ params }) => {
       return errorResponse(AppError.notFound, `Todo with id ${id} does not exist`)
     }
 
-
     const groupChange = todo.done
       ? {
-        todosCount: { decrement: 1 },
-        todosCompleted: { decrement: 1 },
-      }
+          todosCount: { decrement: 1 },
+          todosCompleted: { decrement: 1 },
+        }
       : { todosCount: { decrement: 1 } }
 
     const response = await prismaClient.$transaction([

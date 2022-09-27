@@ -6,12 +6,13 @@
     dispatch('submit', e)
   }
 
+  export let disabled = false
   export let loading = false
   let className = ''
   export { className as class }
 </script>
 
-<form on:submit|preventDefault={submit} class="{className}">
+<form on:submit|preventDefault={submit} class={className}>
   <div class="form-header">
     <h5>
       <slot name="heading" />
@@ -22,7 +23,7 @@
 
   <slot />
 
-  <button type="submit" aria-busy={loading}>
+  <button type="submit" aria-busy={loading} {disabled}>
     <slot name="submit-btn" />
   </button>
 </form>
