@@ -1,8 +1,13 @@
 <script lang="ts">
-  export let height: string
+  export let height = ''
 </script>
 
-<svg {height} viewBox="0 0 24 24" fill="none" style="aspect-ratio: 1;" stroke-width="1.2">
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  style="aspect-ratio: 1; {height.length ? `height: ${height}` : ''};"
+  stroke-width="1.2"
+>
   <path
     stroke-linecap="round"
     stroke-linejoin="round"

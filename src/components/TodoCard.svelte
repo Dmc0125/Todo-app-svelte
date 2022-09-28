@@ -2,7 +2,6 @@
   import truncate from 'lodash.truncate'
   import { page } from '$app/stores'
 
-  import DeleteIcon from './icons/DeleteIcon.svelte'
   import {
     addToDeleteBatch,
     removeFromDeleteBatch,
@@ -14,6 +13,7 @@
   import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
   import IconButton from './buttons/IconButton.svelte'
   import CompleteButton from './buttons/CompleteButton.svelte'
+  import TodoMenu from './TodoMenu.svelte'
 
   export let id: number
   export let title: string
@@ -68,6 +68,8 @@
 
   $: isSetForDelete = $batchForDelete.has(id)
   $: showDone = (!done && $batchForComplete.has(id)) || (done && !$batchForComplete.has(id))
+
+  let showMenu = false
 </script>
 
 <div class="todo-card card-border">
@@ -90,9 +92,6 @@
     </div>
 
     <div class="buttons">
-      <IconButton class="delete-btn" on:click={handleDeleteBtn} dataTooltip="Toggle delete">
-        <DeleteIcon height="100%" />
-      </IconButton>
       <IconButton el="a" href="{$page.url.pathname}/todo-{id}" class="maximize-btn">
         <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path
@@ -102,6 +101,17 @@
             d="M4.5 4.5H8M4.5 4.5V8M4.5 4.5L9 9M19.5 8V4.5M19.5 4.5H16M19.5 4.5L15 9M4.5 16V19.5M4.5 19.5H8M4.5 19.5L9 15M19.5 19.5V16M19.5 19.5H16M19.5 19.5L15 15"
           />
         </svg>
+      </IconButton>
+      <IconButton class="todo-menu-popup-btn" on:click={() => (showMenu = !showMenu)}>
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke="currentColor"
+            d="M7 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM13 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM17 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0Z"
+          />
+        </svg>
+        <TodoMenu todoId={id} class="todo-menu-popup" show={showMenu} on:delete={handleDeleteBtn} />
       </IconButton>
     </div>
   </div>
@@ -173,12 +183,16 @@
     gap: 0.25rem;
   }
 
-  :global(.delete-btn) {
-    --primary-hover: var(--error-clr);
-    --primary-focus: var(--error-shadow-clr);
-  }
-
   :global(.maximize-btn:hover, .maximize-btn:focus) {
     background-color: var(--primary-hover);
+  }
+
+  :global(.todo-menu-popup-btn) {
+    position: relative;
+  }
+
+  :global(.todo-menu-popup) {
+    left: -0.5rem;
+    transform: translateX(-100%);
   }
 </style>

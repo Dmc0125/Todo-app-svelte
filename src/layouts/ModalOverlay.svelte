@@ -22,9 +22,10 @@
   const dispatch = createEventDispatcher()
 
   let show = false
+  export let id = 'true'
 
   const unsub = page.subscribe((_page) => {
-    if (_page.url.searchParams.get('showModal') === 'true') {
+    if (_page.url.searchParams.get('showModal') === id) {
       dispatch('show')
       show = true
     } else {
@@ -71,7 +72,7 @@
     background: rgba(0, 0, 0, 0.05);
     display: grid;
     place-items: center;
-    z-index: 1000;
+    z-index: 10000;
   }
 
   :global([data-theme='dark'] .modal-overlay) {

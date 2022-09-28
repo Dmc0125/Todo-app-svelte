@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types'
 import { AppError, errorResponse, jsonResponse } from '$lib/utils/response'
 import { prismaClient } from '$lib/utils/prisma'
 import { groupId } from '$lib/schemas/group'
-import { todoId } from '$lib/schemas/todo'
+import { titleSchema, todoId } from '$lib/schemas/todo'
 
 const getSchema = z.object({
   todoId,
@@ -35,7 +35,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
 }
 
 const setDoneSchema = z.object({
-  done: z.boolean(),
+  done: z.boolean().or(z.undefined()),
+  title: titleSchema.or(z.undefined()),
   groupId,
   todoId,
 })
@@ -50,17 +51,24 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     return errorResponse(AppError.validation, result.error)
   }
 
-  const { groupId, todoId, done } = result.data
+  const { groupId, todoId, ...data } = result.data
 
   try {
+    const changedData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => {
+        if (value !== undefined) {
+          return true
+        }
+        return false
+      }),
+    )
+
     const [todo] = await prismaClient.$transaction([
       prismaClient.todo.update({
         where: {
           id: todoId,
         },
-        data: {
-          done,
-        },
+        data: changedData,
       }),
       prismaClient.todoGroup.update({
         where: {

@@ -10,7 +10,10 @@
   import IconButton from '$lib/components/buttons/IconButton.svelte'
   import ArrowLeft from '$lib/components/icons/ArrowLeftIcon.svelte'
   import DeleteButton from '$lib/components/buttons/DeleteButton.svelte'
-  import ConfirmPopup, { hideConfirmPopup, showConfirmPopup } from '$lib/components/ConfirmPopup.svelte'
+  import ConfirmPopup, {
+    hideConfirmPopup,
+    showConfirmPopup,
+  } from '$lib/components/ConfirmPopup.svelte'
   import ModifyTodoForm from '$lib/components/forms/ModifyTodoForm.svelte'
   import CompleteButton from '$lib/components/buttons/CompleteButton.svelte'
 
@@ -20,7 +23,9 @@
 
   $: todo = $todos[groupId]?.find(({ id }) => todoId === id)
 
-  const { execute: deleteTodo, state: deleteTodoState } = useFetchInternal<[Todo, TodoGroup]>(`/api/todo/${todoId}`)
+  const { execute: deleteTodo, state: deleteTodoState } = useFetchInternal<[Todo, TodoGroup]>(
+    `/api/todo/${todoId}`,
+  )
   $: {
     if ($deleteTodoState.error) {
       showNotification({
@@ -40,7 +45,9 @@
     }
   }
 
-  const { execute: completeTodo, state: completeTodoState } = useFetchInternal<Todo>(`/api/todo/${todoId}`)
+  const { execute: completeTodo, state: completeTodoState } = useFetchInternal<Todo>(
+    `/api/todo/${todoId}`,
+  )
   $: {
     if ($completeTodoState.error) {
       showNotification({
@@ -87,9 +94,14 @@
   Are you sure you want to delete this todo?
 </ConfirmPopup>
 
-<ConfirmPopup loading={$completeTodoState.loading} id="complete-todo" on:save={handleCompleteTodo} on:cancel={() => {
-  unsavedCompleteState = todo?.done || false
-}}>
+<ConfirmPopup
+  loading={$completeTodoState.loading}
+  id="complete-todo"
+  on:save={handleCompleteTodo}
+  on:cancel={() => {
+    unsavedCompleteState = todo?.done || false
+  }}
+>
   Are you sure you want to {todo?.done ? 'undo' : ''} complete this todo?
 </ConfirmPopup>
 
@@ -110,10 +122,13 @@
           <h3>{todo.title}</h3>
         </div>
 
-        <CompleteButton on:click={() => {
-          showConfirmPopup('complete-todo')
-          unsavedCompleteState = !unsavedCompleteState
-        }} showDone={unsavedCompleteState} />
+        <CompleteButton
+          on:click={() => {
+            showConfirmPopup('complete-todo')
+            unsavedCompleteState = !unsavedCompleteState
+          }}
+          showDone={unsavedCompleteState}
+        />
       </header>
 
       <div class="todo-content">

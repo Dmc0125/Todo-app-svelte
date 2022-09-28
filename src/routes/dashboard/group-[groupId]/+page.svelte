@@ -13,14 +13,14 @@
   import CreateTodoForm from '$lib/components/forms/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import TodoCard from '$lib/components/TodoCard.svelte'
-  import ArrowLeft from '$lib/components/icons/ArrowLeftIcon.svelte'
   import ConfirmPopup, {
     showConfirmPopup,
     hideConfirmPopup,
   } from '$lib/components/ConfirmPopup.svelte'
   import DeleteButton from '$lib/components/buttons/DeleteButton.svelte'
-    import IconButton from '$lib/components/buttons/IconButton.svelte'
-    import ArrowLeftIcon from '$lib/components/icons/ArrowLeftIcon.svelte'
+  import IconButton from '$lib/components/buttons/IconButton.svelte'
+  import ArrowLeftIcon from '$lib/components/icons/ArrowLeftIcon.svelte'
+  import ChangeTodoTitleForm from '$lib/components/forms/ChangeTodoTitleForm.svelte'
 
   export let data: PageData
 
@@ -162,6 +162,7 @@
 </svelte:head>
 
 <CreateTodoForm {groupId} />
+<ChangeTodoTitleForm {groupId} />
 
 <main class="container">
   <article class="card-border">
