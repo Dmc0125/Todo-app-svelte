@@ -10,7 +10,7 @@
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import FormLayout from '$lib/layouts/FormLayout.svelte'
   import FormLabelLayout from '$lib/layouts/FormLabelLayout.svelte'
-  import CloseFormModalButton from './CloseFormModalButton.svelte'
+  import CloseFormModalButton from '../buttons/CloseFormModalButton.svelte'
 
   type FormData = Record<
     'name' | 'description',

@@ -61,4 +61,8 @@
     border-radius: 100%;
     border: 1px solid var(--h6-color);
   }
+
+  :global(.icon-back-btn:hover, .icon-back-btn:focus) {
+    background-color: var(--primary-hover);
+  }
 </style>

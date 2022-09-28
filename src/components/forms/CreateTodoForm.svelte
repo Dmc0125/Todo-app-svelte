@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { Todo } from '@prisma/client'
 
-  import FormLayout from '../layouts/FormLayout.svelte'
-  import FormLabelLayout from '../layouts/FormLabelLayout.svelte'
-  import CloseFormModalButton from './CloseFormModalButton.svelte'
+  import FormLayout from '../../layouts/FormLayout.svelte'
+  import FormLabelLayout from '../../layouts/FormLabelLayout.svelte'
+  import CloseFormModalButton from '../buttons/CloseFormModalButton.svelte'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { useForm } from '$lib/hooks/useForm'
   import { titleSchema, contentSchema } from '$lib/schemas/todo'

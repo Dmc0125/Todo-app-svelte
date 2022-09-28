@@ -3,7 +3,7 @@
 
   import type { PageData } from './$types'
   import { groups } from '$lib/store/groups'
-  import CreateGroupForm from '$lib/components/CreateGroupForm.svelte'
+  import CreateGroupForm from '$lib/components/forms/CreateGroupForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
 
   export let data: PageData

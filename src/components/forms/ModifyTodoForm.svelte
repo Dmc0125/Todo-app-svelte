@@ -5,7 +5,7 @@
   import { contentSchema, titleSchema } from '$lib/schemas/todo'
   import ModalOverlay from '$lib/layouts/ModalOverlay.svelte'
   import FormLayout from '$lib/layouts/FormLayout.svelte'
-  import CloseFormModalButton from '../CloseFormModalButton.svelte'
+  import CloseFormModalButton from '../buttons/CloseFormModalButton.svelte'
   import FormLabelLayout from '$lib/layouts/FormLabelLayout.svelte'
 
   export let todo: Todo

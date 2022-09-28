@@ -12,7 +12,7 @@
     removeFromCompleteBatch,
   } from '$lib/store/todos'
   import { showConfirmPopup, confirmPopupState } from '$lib/components/ConfirmPopup.svelte'
-  import IconButton from './IconButton.svelte'
+  import IconButton from './buttons/IconButton.svelte'
   import CompleteButton from './buttons/CompleteButton.svelte'
 
   export let id: number

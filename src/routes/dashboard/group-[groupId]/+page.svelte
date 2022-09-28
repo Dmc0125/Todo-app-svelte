@@ -10,7 +10,7 @@
   import { batchForComplete, todos } from '$lib/store/todos'
   import { serverErrorMessage, showNotification } from '$lib/store/notification'
   import { batchForDelete } from '$lib/store/todos'
-  import CreateTodoForm from '$lib/components/CreateTodoForm.svelte'
+  import CreateTodoForm from '$lib/components/forms/CreateTodoForm.svelte'
   import EmptyContainerLayout from '$lib/layouts/EmptyContainerLayout.svelte'
   import TodoCard from '$lib/components/TodoCard.svelte'
   import ArrowLeft from '$lib/components/icons/ArrowLeftIcon.svelte'
@@ -19,6 +19,8 @@
     hideConfirmPopup,
   } from '$lib/components/ConfirmPopup.svelte'
   import DeleteButton from '$lib/components/buttons/DeleteButton.svelte'
+    import IconButton from '$lib/components/buttons/IconButton.svelte'
+    import ArrowLeftIcon from '$lib/components/icons/ArrowLeftIcon.svelte'
 
   export let data: PageData
 
@@ -171,9 +173,9 @@
     {:else}
       <div class="todo-header">
         <nav class="todo-header-nav">
-          <a href="/dashboard" class="todo-header-back-btn" data-sveltekit-prefetch>
-            <ArrowLeft />
-          </a>
+          <IconButton href="/dashboard" el="a" class="icon-back-btn">
+            <ArrowLeftIcon />
+          </IconButton>
 
           <h3>
             {group.name}
@@ -264,14 +266,6 @@
 
   .todo-header-nav h3 {
     margin-bottom: 0;
-  }
-
-  .todo-header-back-btn {
-    --size: 2rem;
-    width: var(--size);
-    height: var(--size);
-    padding: 0;
-    margin: 0;
   }
 
   .todo-header-buttons {

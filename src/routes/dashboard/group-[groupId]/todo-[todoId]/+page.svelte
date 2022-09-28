@@ -7,7 +7,7 @@
   import { todos } from '$lib/store/todos'
   import { useFetchInternal } from '$lib/hooks/useFetchInternal'
   import { showNotification } from '$lib/store/notification'
-  import IconButton from '$lib/components/IconButton.svelte'
+  import IconButton from '$lib/components/buttons/IconButton.svelte'
   import ArrowLeft from '$lib/components/icons/ArrowLeftIcon.svelte'
   import DeleteButton from '$lib/components/buttons/DeleteButton.svelte'
   import ConfirmPopup, { hideConfirmPopup, showConfirmPopup } from '$lib/components/ConfirmPopup.svelte'
@@ -154,10 +154,6 @@
     width: fit-content;
     margin-top: 1rem;
     margin-inline: auto;
-  }
-
-  :global(.icon-back-btn:hover, .icon-back-btn:focus) {
-    background-color: var(--primary-hover);
   }
 
   header {
